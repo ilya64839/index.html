@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>AdCraft — AI Рекламная Платформа</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#05050a;--bg2:#0a0a14;--bg3:#0f0f1e;
+  --s:#141428;--s2:#1a1a32;--s3:#20203c;
+  --b:rgba(255,255,255,.06);--b2:rgba(255,255,255,.11);--b3:rgba(255,255,255,.18);
+  --p:#5b3fff;--p2:#7c5cfc;--p3:#a48dff;
+  --g:#00e5a0;--g2:#00c488;
+  --pk:#ff3d7f;--am:#ffb020;--rd:#ff4545;--cy:#00d4ff;
+  --t:#eeeaff;--t2:#8880b0;--t3:#4a4870;
+  --r:16px;--rs:10px;
+  --proxy:https://noisy-tree-d442ai-proxy.ilyalebedev152.workers.dev;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--t);overflow-x:hidden;min-height:100vh}
+
+/* NOISE */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+
+/* GRID */
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(91,63,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(91,63,255,.02) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(5,5,10,.88);backdrop-filter:blur(32px);border-bottom:1px solid var(--b)}
+.logo{font-family:'Cabinet Grotesk',sans-serif;font-size:1.2rem;font-weight:900;display:flex;align-items:center;gap:10px;color:var(--t);cursor:pointer;letter-spacing:-.02em}
+.logo-mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--p),var(--g));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;box-shadow:0 0 20px rgba(91,63,255,.4)}
+.nav-center{display:flex;gap:2px;background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:12px;padding:3px}
+.nav-center button{padding:7px 16px;border-radius:9px;font-size:13px;font-weight:500;color:var(--t2);background:none;border:none;cursor:pointer;font-family:'Instrument Sans',sans-serif;transition:all .2s;white-space:nowrap}
+.nav-center button:hover{color:var(--t)}
+.nav-center button.on{background:var(--s2);color:var(--t);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.nav-right{display:flex;align-items:center;gap:8px}
+.nav-user{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:10px;background:var(--s);border:1px solid var(--b2);cursor:pointer;transition:all .2s}
+.nav-user:hover{border-color:var(--b3)}
+.nav-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--pk));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;font-family:'Cabinet Grotesk',sans-serif}
+.nav-name{font-size:13px;color:var(--t2);font-weight:500}
+.nav-pro-badge{font-size:10px;font-weight:700;background:linear-gradient(135deg,var(--am),#ff8c00);color:#000;padding:2px 7px;border-radius:6px}
+.hbg{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none}
+.hbg span{width:22px;height:2px;background:var(--t2);border-radius:2px;display:block;transition:all .3s}
+
+/* PAGES */
+.pg{display:none;position:relative;z-index:1;padding-top:60px}
+.pg.on{display:block}
+
+/* ═══ LANDING ═══ */
+.hero{min-height:calc(100vh - 60px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px;position:relative;overflow:hidden}
+.hero-orb{position:absolute;border-radius:50%;pointer-events:none}
+.h-o1{width:700px;height:700px;background:radial-gradient(circle,rgba(91,63,255,.2),transparent 65%);top:-200px;left:50%;transform:translateX(-50%);filter:blur(60px)}
+.h-o2{width:400px;height:400px;background:radial-gradient(circle,rgba(0,229,160,.12),transparent 65%);bottom:0;right:-100px;filter:blur(80px)}
+.h-o3{width:300px;height:300px;background:radial-gradient(circle,rgba(255,61,127,.1),transparent 65%);top:40%;left:-80px;filter:blur(80px)}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(91,63,255,.1);border:1px solid rgba(91,63,255,.25);color:var(--p3);font-size:12px;font-weight:600;padding:7px 16px;border-radius:20px;margin-bottom:32px;animation:fu .8s ease both;letter-spacing:.04em}
+.hero-dot{width:7px;height:7px;border-radius:50%;background:var(--g);box-shadow:0 0 8px var(--g);animation:pl 2s infinite}
+@keyframes pl{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.6)}}
+.hero h1{font-family:'Cabinet Grotesk',sans-serif;font-size:clamp(2.8rem,8vw,5.5rem);font-weight:900;line-height:1.02;letter-spacing:-.04em;margin-bottom:24px;animation:fu .8s .1s ease both}
+.hero h1 .gr{background:linear-gradient(120deg,var(--p2) 0%,var(--g) 60%,var(--cy) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero h1 .pk{background:linear-gradient(120deg,var(--pk),var(--am));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:clamp(1rem,2.5vw,1.15rem);color:var(--t2);max-width:600px;line-height:1.7;margin:0 auto 40px;animation:fu .8s .2s ease both;font-weight:400}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:fu .8s .3s ease both}
+.btn{padding:14px 28px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Instrument Sans',sans-serif;border:none;transition:all .25s;letter-spacing:.01em}
+.btn-p{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;box-shadow:0 4px 32px rgba(91,63,255,.35)}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 8px 48px rgba(91,63,255,.5)}
+.btn-s{background:rgba(255,255,255,.06);color:var(--t2);border:1px solid var(--b2)}
+.btn-s:hover{border-color:var(--p2);color:var(--p3)}
+.btn-g{background:linear-gradient(135deg,var(--g),var(--g2));color:#000;font-weight:700;box-shadow:0 4px 24px rgba(0,229,160,.25)}
+.btn-g:hover{transform:translateY(-2px);box-shadow:0 8px 36px rgba(0,229,160,.4)}
+@keyframes fu{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+
+/* HERO STATS */
+.hero-stats{display:flex;gap:0;margin-top:64px;border:1px solid var(--b2);border-radius:18px;overflow:hidden;animation:fu .8s .4s ease both;background:rgba(255,255,255,.02);backdrop-filter:blur(10px)}
+.hs{flex:1;padding:24px 20px;text-align:center;position:relative}
+.hs+.hs::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:1px;background:var(--b)}
+.hs-n{font-family:'Cabinet Grotesk',sans-serif;font-size:2rem;font-weight:900;letter-spacing:-.03em;background:linear-gradient(135deg,var(--t),var(--p3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hs-l{font-size:12px;color:var(--t3);margin-top:3px;font-weight:500}
+
+/* SECTION */
+.land-sec{padding:100px 24px;max-width:1120px;margin:0 auto}
+.sl{font-size:11px;font-weight:700;color:var(--p2);text-transform:uppercase;letter-spacing:.14em;margin-bottom:12px;text-align:center}
+.sh{font-family:'Cabinet Grotesk',sans-serif;font-size:clamp(2rem,5vw,3rem);font-weight:900;text-align:center;letter-spacing:-.03em;margin-bottom:14px;line-height:1.1}
+.ss{text-align:center;color:var(--t2);font-size:.95rem;max-width:520px;margin:0 auto 60px;line-height:1.7}
+
+/* FEATURE CARDS */
+.fc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.fc{background:var(--s);border:1px solid var(--b);border-radius:22px;padding:28px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;group:true}
+.fc::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(91,63,255,.08),transparent 60%);opacity:0;transition:.3s}
+.fc:hover{border-color:rgba(91,63,255,.35);transform:translateY(-5px);box-shadow:0 32px 80px rgba(91,63,255,.14)}
+.fc:hover::before{opacity:1}
+.fc.special{background:linear-gradient(135deg,rgba(91,63,255,.08),rgba(0,229,160,.04));border-color:rgba(91,63,255,.2)}
+.fc.special:hover{border-color:rgba(91,63,255,.5)}
+.fc-badge{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;font-weight:800;background:linear-gradient(135deg,var(--am),#ff8);color:#000;padding:3px 9px;border-radius:8px;margin-bottom:16px;letter-spacing:.06em}
+.fc-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:18px}
+.fc h3{font-family:'Cabinet Grotesk',sans-serif;font-size:1.05rem;font-weight:800;margin-bottom:10px;letter-spacing:-.01em}
+.fc p{font-size:13px;color:var(--t2);line-height:1.65}
+.fc-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:16px}
+.fc-tag{font-size:11px;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.04);color:var(--t3);border:1px solid var(--b)}
+
+/* PRICING */
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:56px}
+.pc{background:var(--s);border:1px solid var(--b);border-radius:22px;padding:28px;position:relative;transition:all .3s}
+.pc.pop{border-color:var(--p);background:linear-gradient(135deg,rgba(91,63,255,.07),rgba(0,229,160,.03))}
+.pc-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;font-size:10px;font-weight:800;padding:4px 14px;border-radius:20px;white-space:nowrap;letter-spacing:.04em}
+.pc-name{font-family:'Cabinet Grotesk',sans-serif;font-size:.8rem;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+.pc-price{font-family:'Cabinet Grotesk',sans-serif;font-size:2.8rem;font-weight:900;letter-spacing:-.04em;margin-bottom:4px}
+.pc-price sup{font-size:1.1rem;vertical-align:top;margin-top:10px;font-weight:600}
+.pc-period{font-size:12px;color:var(--t3);margin-bottom:24px;font-weight:500}
+.pc-feats{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:26px}
+.pc-feats li{font-size:13px;color:var(--t2);display:flex;align-items:center;gap:8px}
+.pc-feats li::before{content:'✓';color:var(--g);font-weight:800;font-size:13px;flex-shrink:0}
+.pc-feats li.no{color:var(--t3)}
+.pc-feats li.no::before{content:'✕';color:var(--t3)}
+.pc-btn{width:100%;padding:13px;border-radius:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Instrument Sans',sans-serif;border:none;transition:all .22s}
+.pc-btn.ol{background:transparent;color:var(--t2);border:1px solid var(--b2)}
+.pc-btn.ol:hover{border-color:var(--p2);color:var(--p3)}
+.pc-btn.fl{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;box-shadow:0 4px 24px rgba(91,63,255,.3)}
+.pc-btn.fl:hover{transform:translateY(-1px);box-shadow:0 8px 36px rgba(91,63,255,.45)}
+
+/* CTA */
+.land-cta{padding:100px 24px;text-align:center;position:relative;overflow:hidden;background:var(--bg2);border-top:1px solid var(--b)}
+.land-cta::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(91,63,255,.15),transparent 60%)}
+.land-cta h2{font-family:'Cabinet Grotesk',sans-serif;font-size:clamp(1.8rem,5vw,3rem);font-weight:900;letter-spacing:-.03em;margin-bottom:14px;position:relative}
+.land-cta p{color:var(--t2);margin-bottom:32px;font-size:.95rem;position:relative}
+footer{padding:28px 24px;text-align:center;border-top:1px solid var(--b);color:var(--t3);font-size:12px}
+
+/* ═══ APP ═══ */
+#pg-app{min-height:100vh}
+.app-layout{display:flex;height:calc(100vh - 60px)}
+
+/* SIDEBAR */
+.sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--b);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.sb-section{padding:18px 14px 5px;font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.14em}
+.sbi{display:flex;align-items:center;gap:9px;padding:9px 12px;margin:2px 7px;border-radius:10px;font-size:13px;color:var(--t2);cursor:pointer;transition:all .18s;border:none;background:none;font-family:'Instrument Sans',sans-serif;text-align:left;width:calc(100% - 14px)}
+.sbi:hover{background:rgba(255,255,255,.04);color:var(--t)}
+.sbi.on{background:rgba(91,63,255,.14);color:var(--p3);font-weight:600}
+.sbi .ic{font-size:16px;flex-shrink:0;width:20px;text-align:center}
+.sbi .bdg{margin-left:auto;font-size:9px;background:var(--p);color:#fff;padding:2px 6px;border-radius:7px;font-weight:800}
+.sbi .nbdg{margin-left:auto;font-size:9px;background:linear-gradient(135deg,var(--am),#ff8);color:#000;padding:2px 6px;border-radius:7px;font-weight:800}
+.sbi .gbdg{margin-left:auto;font-size:9px;background:linear-gradient(135deg,var(--g),var(--g2));color:#000;padding:2px 6px;border-radius:7px;font-weight:800}
+.sb-div{height:1px;background:var(--b);margin:7px 14px}
+
+/* FREE COUNTER */
+.sb-counter{margin:10px 12px;background:var(--s);border:1px solid var(--b2);border-radius:12px;padding:12px}
+.sb-counter-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.sb-counter-label{font-size:11px;color:var(--t2);font-weight:500}
+.sb-counter-val{font-size:12px;font-weight:700;color:var(--t)}
+.sb-counter-bar{height:4px;background:var(--s3);border-radius:2px;overflow:hidden}
+.sb-counter-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--g),var(--p2));transition:width .5s ease}
+.sb-upgrade{width:100%;margin-top:10px;padding:9px;border-radius:9px;font-size:12px;font-weight:700;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;cursor:pointer;font-family:'Instrument Sans',sans-serif;transition:all .2s;box-shadow:0 2px 14px rgba(91,63,255,.3)}
+.sb-upgrade:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(91,63,255,.45)}
+
+/* CONTENT */
+.app-content{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--bg)}
+.app-content::-webkit-scrollbar{width:4px}
+.app-content::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+/* TOOL VIEWS */
+.tv{display:none;padding:28px;max-width:840px;animation:fu .3s ease}
+.tv.on{display:block}
+.tv-full{display:none;height:calc(100vh - 60px);flex-direction:column}
+.tv-full.on{display:flex}
+.th{margin-bottom:26px}
+.th h2{font-family:'Cabinet Grotesk',sans-serif;font-size:1.4rem;font-weight:900;margin-bottom:6px;display:flex;align-items:center;gap:10px;letter-spacing:-.02em}
+.th p{font-size:13px;color:var(--t2)}
+.new-tag{font-size:9px;font-weight:800;background:linear-gradient(135deg,var(--am),#ff8);color:#000;padding:3px 8px;border-radius:7px;letter-spacing:.06em}
+
+/* FORMS */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg.col1{grid-template-columns:1fr}
+.fgp label{display:block;font-size:12px;font-weight:600;color:var(--t2);margin-bottom:6px;letter-spacing:.02em}
+input[type=text],input[type=number],input[type=email],input[type=password],textarea,select{width:100%;background:var(--bg2);border:1px solid var(--b2);border-radius:var(--rs);padding:10px 14px;color:var(--t);font-size:13.5px;font-family:'Instrument Sans',sans-serif;transition:border-color .18s;resize:vertical;outline:none;-webkit-appearance:none}
+input:focus,textarea:focus,select:focus{border-color:var(--p2)}
+select option{background:var(--bg3)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.ch{padding:7px 14px;border-radius:20px;font-size:12.5px;border:1px solid var(--b2);color:var(--t2);cursor:pointer;transition:all .18s;background:none;font-family:'Instrument Sans',sans-serif;font-weight:500}
+.ch:hover,.ch.on{background:rgba(91,63,255,.14);border-color:var(--p2);color:var(--p3)}
+.run-btn{width:100%;padding:14px;border-radius:11px;font-size:14px;font-weight:700;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;cursor:pointer;font-family:'Instrument Sans',sans-serif;box-shadow:0 4px 24px rgba(91,63,255,.28);transition:all .22s;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.01em}
+.run-btn:hover{transform:translateY(-1px);box-shadow:0 8px 36px rgba(91,63,255,.42)}
+.run-btn:active{transform:scale(.98)}
+.run-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* OUTPUT */
+.out{background:var(--bg2);border:1px solid var(--b2);border-radius:var(--r);padding:22px;margin-top:18px;display:none;animation:fu .3s ease}
+.out.on{display:block}
+.out-lbl{font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.14em;margin-bottom:13px}
+.out-txt{font-size:13.5px;line-height:1.8;color:var(--t);white-space:pre-wrap}
+.out-actions{display:flex;gap:7px;margin-top:14px;flex-wrap:wrap}
+.ab{padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid var(--b2);color:var(--t2);cursor:pointer;background:none;font-family:'Instrument Sans',sans-serif;transition:all .18s}
+.ab:hover{border-color:var(--p2);color:var(--p3)}
+.ab.pr{background:var(--p);color:#fff;border-color:var(--p)}
+.ab.pr:hover{background:var(--p2)}
+
+/* SCORE VARIANTS */
+.vars{display:grid;gap:11px;margin-top:16px}
+.vc{background:var(--s);border:1px solid var(--b);border-radius:12px;padding:18px;cursor:pointer;transition:all .2s}
+.vc:hover,.vc.pk{border-color:rgba(91,63,255,.45);background:rgba(91,63,255,.06)}
+.vn{font-size:9.5px;font-weight:800;color:var(--p2);margin-bottom:6px;letter-spacing:.1em;font-family:'Cabinet Grotesk',sans-serif}
+.vt{font-size:14px;color:var(--t);line-height:1.5;font-weight:500}
+.vrow{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.vtip{font-size:11.5px;color:var(--t3);flex:1;margin-right:10px}
+.vscore{font-size:14px;font-weight:800;font-family:'Cabinet Grotesk',sans-serif}
+.sbar{height:3px;background:var(--s3);border-radius:2px;margin-top:7px;overflow:hidden}
+.sfill{height:100%;border-radius:2px;transition:width 1.3s ease}
+
+/* METER */
+.meter-g{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.mc{background:var(--s);border:1px solid var(--b);border-radius:11px;padding:14px}
+.mc-lbl{font-size:11px;color:var(--t3);margin-bottom:5px;font-weight:600}
+.mc-val{font-size:1.4rem;font-weight:900;font-family:'Cabinet Grotesk',sans-serif}
+.mc-bar{height:3px;background:var(--s3);border-radius:2px;margin-top:8px;overflow:hidden}
+.mc-fill{height:100%;border-radius:2px;transition:width 1.3s ease}
+
+/* FUNNEL */
+.fn-steps{display:grid;gap:12px;margin-top:18px}
+.fn-step{background:var(--s);border:1px solid var(--b);border-radius:13px;padding:18px;position:relative}
+.fn-lbl{font-size:10px;font-weight:800;color:var(--p2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;font-family:'Cabinet Grotesk',sans-serif}
+.fn-goal{font-size:11.5px;color:var(--t3);margin-bottom:10px}
+.fn-txt{font-size:13.5px;color:var(--t);line-height:1.65}
+.fn-arr{text-align:center;font-size:18px;color:var(--t3);padding:2px 0}
+
+/* CALENDAR */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:18px}
+.cal-head{font-size:10px;font-weight:700;color:var(--t3);text-align:center;padding:6px 0;text-transform:uppercase;letter-spacing:.06em}
+.cal-day{background:var(--s);border:1px solid var(--b);border-radius:9px;padding:8px;min-height:80px;cursor:pointer;transition:all .2s;position:relative}
+.cal-day:hover{border-color:var(--b2)}
+.cal-day.has-post{border-color:rgba(91,63,255,.3);background:rgba(91,63,255,.06)}
+.cal-day-num{font-size:11px;font-weight:700;color:var(--t3);margin-bottom:4px;font-family:'Cabinet Grotesk',sans-serif}
+.cal-post{font-size:10px;color:var(--p3);background:rgba(91,63,255,.12);border-radius:5px;padding:3px 5px;margin-top:3px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.3}
+.cal-empty{color:var(--t3);font-size:9px;margin-top:6px}
+
+/* UTM */
+.utm-res{background:var(--bg2);border:1px solid rgba(0,229,160,.25);border-radius:11px;padding:14px;font-family:monospace;font-size:12px;color:var(--g);word-break:break-all;margin-top:16px;line-height:1.65;display:none}
+
+/* BUDGET */
+.calc-g{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.cc{background:var(--s);border:1px solid var(--b);border-radius:12px;padding:16px;text-align:center}
+.cc-val{font-family:'Cabinet Grotesk',sans-serif;font-size:1.6rem;font-weight:900;margin-bottom:3px;letter-spacing:-.02em}
+.cc-lbl{font-size:11px;color:var(--t3);font-weight:500}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--s3);border-radius:2px;outline:none;border:none;padding:0;margin-top:10px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--p);cursor:pointer;box-shadow:0 0 12px rgba(91,63,255,.5)}
+.rl{display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-top:6px}
+
+/* CHAT */
+.chat-msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.chat-msgs::-webkit-scrollbar{width:3px}
+.chat-msgs::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.mr{display:flex;gap:10px;max-width:88%;animation:fu .25s ease}
+.mr.user{align-self:flex-end;flex-direction:row-reverse}
+.mav{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;margin-top:2px;font-family:'Cabinet Grotesk',sans-serif}
+.mav.bot{background:rgba(91,63,255,.2);color:var(--p3)}
+.mav.usr{background:rgba(0,229,160,.15);color:var(--g)}
+.mb{padding:12px 16px;border-radius:16px;font-size:13.5px;line-height:1.7;color:var(--t)}
+.mr.bot .mb{background:var(--s);border:1px solid var(--b);border-bottom-left-radius:4px}
+.mr.user .mb{background:var(--p);color:#fff;border-bottom-right-radius:4px}
+.chat-sugs{padding:0 20px 10px;display:flex;flex-wrap:wrap;gap:6px}
+.sug{font-size:12px;padding:7px 13px;border-radius:20px;border:1px solid var(--b2);color:var(--t2);cursor:pointer;background:none;font-family:'Instrument Sans',sans-serif;transition:all .18s;white-space:nowrap;font-weight:500}
+.sug:hover{border-color:var(--p2);color:var(--p3);background:rgba(91,63,255,.07)}
+.chat-bottom{padding:12px 18px;border-top:1px solid var(--b);background:var(--bg2);display:flex;gap:10px;align-items:flex-end}
+.cin{flex:1;background:var(--s);border:1px solid var(--b2);border-radius:13px;padding:12px 16px;font-size:13.5px;color:var(--t);font-family:'Instrument Sans',sans-serif;resize:none;outline:none;min-height:46px;max-height:120px;transition:border-color .18s}
+.cin:focus{border-color:rgba(91,63,255,.45)}
+.csend{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--p2));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:all .2s;box-shadow:0 2px 16px rgba(91,63,255,.35);color:#fff;flex-shrink:0}
+.csend:hover{transform:scale(1.08)}
+.td{display:flex;gap:5px;padding:4px 0}
+.td span{width:7px;height:7px;border-radius:50%;background:var(--t3);animation:td 1.2s infinite}
+.td span:nth-child(2){animation-delay:.2s}
+.td span:nth-child(3){animation-delay:.4s}
+@keyframes td{0%,60%,100%{opacity:.3;transform:scale(.8)}30%{opacity:1;transform:scale(1)}}
+
+/* LOADING */
+.ld{display:flex;align-items:center;gap:9px;color:var(--t2);font-size:13px}
+.sp{width:16px;height:16px;border:2px solid var(--b2);border-top-color:var(--p);border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* PAYMENT MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);display:none}
+.modal-bg.on{display:flex;animation:fu .25s ease}
+.modal{background:var(--bg2);border:1px solid var(--b2);border-radius:24px;padding:36px;max-width:480px;width:100%;position:relative;box-shadow:0 32px 100px rgba(0,0,0,.5)}
+.modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:var(--s);border:1px solid var(--b2);color:var(--t2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{border-color:var(--b3);color:var(--t)}
+.modal h2{font-family:'Cabinet Grotesk',sans-serif;font-size:1.5rem;font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+.modal-sub{font-size:13.5px;color:var(--t2);margin-bottom:24px;line-height:1.6}
+.plan-select{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:24px}
+.ps{background:var(--s);border:1px solid var(--b);border-radius:13px;padding:14px;cursor:pointer;transition:all .2s;text-align:center}
+.ps:hover,.ps.on{border-color:var(--p);background:rgba(91,63,255,.08)}
+.ps-name{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.ps-price{font-family:'Cabinet Grotesk',sans-serif;font-size:1.4rem;font-weight:900;letter-spacing:-.02em}
+.ps-period{font-size:10.5px;color:var(--t3);margin-top:2px}
+.ps-save{font-size:10px;font-weight:700;color:var(--g);margin-top:4px}
+.pay-feats{display:grid;gap:8px;margin-bottom:24px}
+.pf{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t2)}
+.pf::before{content:'✓';color:var(--g);font-weight:800;flex-shrink:0}
+.pay-btn{width:100%;padding:15px;border-radius:12px;font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;cursor:pointer;font-family:'Instrument Sans',sans-serif;box-shadow:0 4px 28px rgba(91,63,255,.35);transition:all .22s;letter-spacing:.01em}
+.pay-btn:hover{transform:translateY(-1px);box-shadow:0 8px 40px rgba(91,63,255,.5)}
+.pay-note{text-align:center;font-size:11.5px;color:var(--t3);margin-top:12px}
+
+/* AUTH MODAL */
+.auth-tabs{display:flex;gap:2px;background:var(--s);border-radius:10px;padding:3px;margin-bottom:24px}
+.auth-tab{flex:1;padding:9px;border-radius:8px;font-size:13px;font-weight:600;color:var(--t2);background:none;border:none;cursor:pointer;font-family:'Instrument Sans',sans-serif;transition:all .2s;text-align:center}
+.auth-tab.on{background:var(--s2);color:var(--t)}
+.auth-input-wrap{margin-bottom:14px}
+.auth-input-wrap label{display:block;font-size:12px;font-weight:600;color:var(--t2);margin-bottom:6px}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--s);border:1px solid var(--b2);color:var(--t);font-size:13px;padding:11px 22px;border-radius:12px;opacity:0;transition:all .28s;pointer-events:none;z-index:1001;white-space:nowrap;box-shadow:0 4px 28px rgba(0,0,0,.5);font-weight:500}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* BOTTOM NAV */
+.bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(5,5,10,.95);backdrop-filter:blur(24px);border-top:1px solid var(--b);z-index:300;grid-template-columns:repeat(5,1fr);padding:6px 0 12px}
+.bni{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:none;background:none;color:var(--t3);font-size:10px;font-family:'Instrument Sans',sans-serif;padding:5px 0;transition:all .18s;width:100%;font-weight:500}
+.bni.on,.bni:hover{color:var(--p3)}
+.bni-ic{font-size:22px}
+
+/* MOBILE */
+@media(max-width:900px){
+  .fc-grid{grid-template-columns:1fr 1fr}
+  .price-grid{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  .nav-center{display:none}
+  .hbg{display:flex}
+  .sidebar{display:none}
+  .app-layout{display:block;height:auto}
+  .app-content{min-height:calc(100vh - 60px - 68px)}
+  .tv{padding:16px;max-width:100%}
+  .tv-full{height:calc(100vh - 60px - 68px)}
+  .fg{grid-template-columns:1fr}
+  .calc-g{grid-template-columns:1fr 1fr}
+  .meter-g{grid-template-columns:1fr 1fr}
+  .bnav{display:grid}
+  .fc-grid{grid-template-columns:1fr}
+  .price-grid{grid-template-columns:1fr}
+  .plan-select{grid-template-columns:1fr}
+  .hero-stats{flex-direction:column}
+  .hs+.hs::before{display:none}
+}
+@media(max-width:420px){.calc-g{grid-template-columns:1fr}.meter-g{grid-template-columns:1fr}.hero h1{font-size:2.2rem}}
+
+/* HISTORY */
+.hi{background:var(--s);border:1px solid var(--b);border-radius:11px;padding:14px 16px;margin-bottom:9px;cursor:pointer;transition:all .2s}
+.hi:hover{border-color:var(--b2)}
+.hi-type{font-size:9.5px;font-weight:800;color:var(--p2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+.hi-txt{font-size:13px;color:var(--t2);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.hi-time{font-size:10.5px;color:var(--t3);margin-top:5px}
+
+/* MOBILE MENU */
+.mob-menu{display:none;position:fixed;top:60px;left:0;right:0;z-index:400;background:rgba(5,5,10,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--b);padding:12px;flex-direction:column;gap:3px}
+.mob-menu.on{display:flex}
+.mm-item{padding:12px 15px;border-radius:11px;font-size:13.5px;color:var(--t2);cursor:pointer;transition:all .18s;border:none;background:none;text-align:left;font-family:'Instrument Sans',sans-serif;width:100%;font-weight:500}
+.mm-item:hover{background:rgba(91,63,255,.09);color:var(--p3)}
+
+/* TRAY */
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+.tpl-c{background:var(--s);border:1px solid var(--b);border-radius:11px;padding:14px;cursor:pointer;transition:all .2s;text-align:center}
+.tpl-c:hover,.tpl-c.on{border-color:var(--p);background:rgba(91,63,255,.08)}
+.tpl-ic{font-size:26px;margin-bottom:7px}
+.tpl-nm{font-size:12px;color:var(--t2);font-weight:500}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo" onclick="goLand()">
+    <div class="logo-mark">⚡</div>AdCraft
+  </div>
+  <div class="nav-center">
+    <button onclick="goLand()">Главная</button>
+    <button onclick="goApp('chat')">Инструменты</button>
+    <button onclick="scrollTo('#pricing')">Цены</button>
+  </div>
+  <div class="nav-right">
+    <div class="nav-user" id="nav-user-area" onclick="openAuth()">
+      <div class="nav-avatar" id="nav-avatar">?</div>
+      <div class="nav-name" id="nav-name">Войти</div>
+    </div>
+    <button class="hbg" onclick="togMob()" id="hbg"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mob-menu" id="mob-menu">
+  <button class="mm-item" onclick="goApp('analyze');togMob()">🔬 Анализ объявления</button>
+  <button class="mm-item" onclick="goApp('funnel');togMob()">🌊 Воронка касаний</button>
+  <button class="mm-item" onclick="goApp('calendar');togMob()">📅 Контент-план</button>
+  <button class="mm-item" onclick="goApp('copy');togMob()">✍️ Генератор текстов</button>
+  <button class="mm-item" onclick="goApp('headlines');togMob()">⚡ Заголовки</button>
+  <button class="mm-item" onclick="goApp('audience');togMob()">🎯 Аудитория</button>
+  <button class="mm-item" onclick="goApp('competitor');togMob()">🕵️ Конкуренты</button>
+  <button class="mm-item" onclick="goApp('utm');togMob()">🔗 UTM</button>
+  <button class="mm-item" onclick="goApp('budget');togMob()">💰 Бюджет</button>
+  <button class="mm-item" onclick="goApp('chat');togMob()">🤖 AI Чат</button>
+  <button class="mm-item" onclick="openPayModal();togMob()">👑 Про подписка</button>
+</div>
+
+<!-- ═══ LANDING ═══ -->
+<div id="pg-land" class="pg on">
+  <section class="hero">
+    <div class="hero-orb h-o1"></div>
+    <div class="hero-orb h-o2"></div>
+    <div class="hero-orb h-o3"></div>
+    <div class="hero-tag"><div class="hero-dot"></div>AI-платформа нового поколения · 2026</div>
+    <h1>Реклама которая<br><span class="gr">продаёт</span> — не<br><span class="pk">сливает бюджет</span></h1>
+    <p class="hero-sub">Анализируйте объявления, стройте воронки, планируйте контент на месяц — всё это делает AI за вас. Быстро, точно, профессионально.</p>
+    <div class="hero-btns">
+      <button class="btn btn-p" onclick="goApp('chat')">Попробовать бесплатно →</button>
+      <button class="btn btn-s" onclick="document.getElementById('feats').scrollIntoView({behavior:'smooth'})">Что умеет ↓</button>
+    </div>
+    <div class="hero-stats">
+      <div class="hs"><div class="hs-n">10</div><div class="hs-l">AI инструментов</div></div>
+      <div class="hs"><div class="hs-n">20+</div><div class="hs-l">ниш-шаблонов</div></div>
+      <div class="hs"><div class="hs-n">∞</div><div class="hs-l">для Pro</div></div>
+      <div class="hs"><div class="hs-n">0₽</div><div class="hs-l">для старта</div></div>
+    </div>
+  </section>
+
+  <section class="land-sec" id="feats">
+    <div class="sl">Возможности</div>
+    <h2 class="sh">Всё что нужно маркетологу</h2>
+    <p class="ss">Десять профессиональных инструментов в одном месте. Три из них — эксклюзивны.</p>
+    <div class="fc-grid">
+      <div class="fc special" onclick="goApp('analyze')">
+        <div class="fc-badge">✦ ТОЛЬКО ЗДЕСЬ</div>
+        <div class="fc-icon" style="background:rgba(255,61,127,.12)">🔬</div>
+        <h3>Анализ ваших объявлений</h3>
+        <p>Вставьте объявление — AI оценит по 6 критериям и напишет улучшенную версию. Как ревью от топового маркетолога.</p>
+        <div class="fc-tags"><span class="fc-tag">Оценка 0–100</span><span class="fc-tag">6 метрик</span><span class="fc-tag">Готовый фикс</span></div>
+      </div>
+      <div class="fc special" onclick="goApp('funnel')">
+        <div class="fc-badge">✦ ТОЛЬКО ЗДЕСЬ</div>
+        <div class="fc-icon" style="background:rgba(0,229,160,.1)">🌊</div>
+        <h3>Воронка касаний</h3>
+        <p>Не одно объявление, а вся цепочка: холодная → интерес → ретаргетинг → закрытие. Готовые тексты для каждого этапа.</p>
+        <div class="fc-tags"><span class="fc-tag">4 этапа</span><span class="fc-tag">TOFU/BOFU</span></div>
+      </div>
+      <div class="fc special" onclick="goApp('calendar')">
+        <div class="fc-badge">✦ ТОЛЬКО ЗДЕСЬ</div>
+        <div class="fc-icon" style="background:rgba(0,212,255,.1)">📅</div>
+        <h3>Контент-план на месяц</h3>
+        <p>AI составит расписание публикаций на 30 дней с темами, форматами и готовыми текстами для каждого дня.</p>
+        <div class="fc-tags"><span class="fc-tag">30 дней</span><span class="fc-tag">Календарь</span></div>
+      </div>
+      <div class="fc" onclick="goApp('copy')">
+        <div class="fc-icon" style="background:rgba(91,63,255,.14)">✍️</div>
+        <h3>Генератор текстов</h3>
+        <p>Продающие объявления для Facebook, Google, VK, TikTok, Telegram. Любой тон, любая цель.</p>
+        <div class="fc-tags"><span class="fc-tag">7 платформ</span><span class="fc-tag">5 тонов</span></div>
+      </div>
+      <div class="fc" onclick="goApp('competitor')">
+        <div class="fc-icon" style="background:rgba(255,176,32,.1)">🕵️</div>
+        <h3>Анализ конкурентов</h3>
+        <p>Введите нишу и получите стратегию обхода конкурентов: их слабые места, ваши преимущества, как выделиться.</p>
+        <div class="fc-tags"><span class="fc-tag">Стратегия</span><span class="fc-tag">Слабые места</span></div>
+      </div>
+      <div class="fc" onclick="goApp('headlines')">
+        <div class="fc-icon" style="background:rgba(255,176,32,.1)">⚡</div>
+        <h3>Заголовки + AI-оценка</h3>
+        <p>5 вариантов заголовков с оценкой силы от 0 до 100. Сразу видно что привлечёт больше кликов.</p>
+        <div class="fc-tags"><span class="fc-tag">5 вариантов</span><span class="fc-tag">Оценка</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="land-sec" id="pricing" style="padding-top:60px">
+    <div class="sl">Тарифы</div>
+    <h2 class="sh">Честные цены</h2>
+    <p class="ss">Начните бесплатно. Обновитесь когда нужно больше.</p>
+    <div class="price-grid">
+      <div class="pc">
+        <div class="pc-name">Старт</div>
+        <div class="pc-price">0 <sup>₽</sup></div>
+        <div class="pc-period">навсегда</div>
+        <ul class="pc-feats">
+          <li>10 генераций в день</li>
+          <li>Все инструменты</li>
+          <li>UTM и Бюджет</li>
+          <li class="no">Контент-план</li>
+          <li class="no">История генераций</li>
+        </ul>
+        <button class="pc-btn ol" onclick="goApp('copy')">Начать</button>
+      </div>
+      <div class="pc pop">
+        <div class="pc-badge">🔥 Популярный</div>
+        <div class="pc-name">Про</div>
+        <div class="pc-price">499 <sup>₽</sup></div>
+        <div class="pc-period">в месяц</div>
+        <ul class="pc-feats">
+          <li>Безлимит генераций</li>
+          <li>Контент-план на 30 дней</li>
+          <li>История генераций</li>
+          <li>Приоритетный AI</li>
+          <li>Экспорт результатов</li>
+        </ul>
+        <button class="pc-btn fl" onclick="openPayModal()">Оформить за 499 ₽</button>
+      </div>
+      <div class="pc">
+        <div class="pc-name">Бизнес</div>
+        <div class="pc-price">1490 <sup>₽</sup></div>
+        <div class="pc-period">в месяц</div>
+        <ul class="pc-feats">
+          <li>Всё из Про</li>
+          <li>До 5 пользователей</li>
+          <li>Приоритетная поддержка</li>
+          <li>API доступ</li>
+          <li>White-label</li>
+        </ul>
+        <button class="pc-btn fl" onclick="openPayModal('business')">Оформить за 1490 ₽</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="land-cta">
+    <h2>Запустите первую<br>кампанию сейчас</h2>
+    <p>Бесплатно. Без регистрации. Результат за 30 секунд.</p>
+    <button class="btn btn-p" onclick="goApp('chat')">Открыть платформу →</button>
+  </div>
+  <footer>AdCraft AI · Работает на Groq AI · ЮKassa · 2026 · <a href="#" onclick="showRekvizity()" style="color:var(--t3);text-decoration:none">Реквизиты</a></footer>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="pg-app" class="pg">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sb-section">Уникальные</div>
+      <button class="sbi" onclick="sw('analyze')" id="si-analyze"><span class="ic">🔬</span>Анализ объявления<span class="nbdg">NEW</span></button>
+      <button class="sbi" onclick="sw('funnel')" id="si-funnel"><span class="ic">🌊</span>Воронка<span class="nbdg">NEW</span></button>
+      <button class="sbi" onclick="sw('calendar')" id="si-calendar"><span class="ic">📅</span>Контент-план<span class="nbdg">NEW</span></button>
+      <div class="sb-div"></div>
+      <div class="sb-section">Инструменты</div>
+      <button class="sbi" onclick="sw('copy')" id="si-copy"><span class="ic">✍️</span>Тексты</button>
+      <button class="sbi" onclick="sw('headlines')" id="si-headlines"><span class="ic">⚡</span>Заголовки</button>
+      <button class="sbi" onclick="sw('audience')" id="si-audience"><span class="ic">🎯</span>Аудитория</button>
+      <button class="sbi" onclick="sw('templates')" id="si-templates"><span class="ic">📋</span>Шаблоны ниш</button>
+      <button class="sbi" onclick="sw('competitor')" id="si-competitor"><span class="ic">🕵️</span>Конкуренты</button>
+      <button class="sbi" onclick="sw('utm')" id="si-utm"><span class="ic">🔗</span>UTM</button>
+      <button class="sbi" onclick="sw('budget')" id="si-budget"><span class="ic">💰</span>Бюджет</button>
+      <div class="sb-div"></div>
+      <button class="sbi" onclick="sw('chat')" id="si-chat"><span class="ic">🤖</span>AI Чат<span class="bdg">AI</span></button>
+      <div class="sb-div"></div>
+      <button class="sbi" onclick="sw('history')" id="si-history"><span class="ic">📂</span>История</button>
+
+      <!-- FREE COUNTER -->
+      <div class="sb-counter" id="sb-counter">
+        <div class="sb-counter-top">
+          <div class="sb-counter-label">Генераций сегодня</div>
+          <div class="sb-counter-val" id="counter-val">0 / 10</div>
+        </div>
+        <div class="sb-counter-bar"><div class="sb-counter-fill" id="counter-fill" style="width:0%"></div></div>
+        <button class="sb-upgrade" onclick="openPayModal()">👑 Безлимит за 499₽</button>
+      </div>
+
+      <div class="sb-div"></div>
+      <button class="sbi" onclick="goLand()" style="margin-bottom:12px"><span class="ic">←</span>На главную</button>
+    </aside>
+
+    <div class="app-content" id="app-content">
+
+      <!-- ANALYZE -->
+      <div class="tv" id="tv-analyze">
+        <div class="th"><h2>🔬 Анализ объявления <span class="new-tag">УНИКАЛЬНО</span></h2><p>Вставьте текст — получите оценку по 6 критериям и улучшенную версию</p></div>
+        <div class="fgp"><label>Текст объявления</label><textarea id="an-txt" rows="5" placeholder="Вставьте текст вашего рекламного объявления..."></textarea></div>
+        <div class="fg" style="margin-top:12px">
+          <div class="fgp"><label>Платформа</label><select id="an-plat"><option>Facebook/Instagram</option><option>Google Ads</option><option>VK</option><option>Яндекс Директ</option><option>TikTok</option><option>Telegram</option></select></div>
+          <div class="fgp"><label>Цель (необязательно)</label><input type="text" id="an-goal" placeholder="Заявки, подписки, продажи..."></div>
+        </div>
+        <button class="run-btn" onclick="runAnalyze()">🔬 Проанализировать</button>
+        <div class="out" id="out-analyze">
+          <div class="meter-g" id="meter-wrap"></div>
+          <div class="out-lbl">Результат</div>
+          <div class="out-txt" id="res-analyze"></div>
+          <div class="out-actions">
+            <button class="ab" onclick="cpClip('res-analyze')">📋 Копировать</button>
+            <button class="ab" onclick="saveH('Анализ',document.getElementById('res-analyze').innerText)">💾 Сохранить</button>
+            <button class="ab pr" onclick="runAnalyze()">↻ Повторить</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FUNNEL -->
+      <div class="tv" id="tv-funnel">
+        <div class="th"><h2>🌊 Воронка касаний <span class="new-tag">УНИКАЛЬНО</span></h2><p>Цепочка объявлений для каждого этапа воронки</p></div>
+        <div class="fg">
+          <div class="fgp"><label>Продукт / услуга</label><input type="text" id="fn-pr" placeholder="Онлайн-курс по маркетингу"></div>
+          <div class="fgp"><label>Платформа</label><select id="fn-pl"><option>Facebook/Instagram</option><option>VK</option><option>Google</option><option>TikTok</option></select></div>
+        </div>
+        <div class="fgp" style="margin-top:12px"><label>Аудитория и выгода</label><input type="text" id="fn-au" placeholder="Предприниматели 25-45, результат за 30 дней"></div>
+        <div class="fgp" style="margin-top:12px"><label>Этапы</label>
+          <div class="chips" id="fn-chips">
+            <button class="ch on" onclick="togCh(this)">❄️ Холодная</button>
+            <button class="ch on" onclick="togCh(this)">🤔 Интерес</button>
+            <button class="ch on" onclick="togCh(this)">🎯 Ретаргетинг</button>
+            <button class="ch on" onclick="togCh(this)">🔥 Закрытие</button>
+          </div>
+        </div>
+        <button class="run-btn" onclick="runFunnel()">🌊 Сгенерировать воронку</button>
+        <div id="fn-out" style="display:none;margin-top:18px"><div class="fn-steps" id="fn-steps"></div></div>
+      </div>
+
+      <!-- CALENDAR -->
+      <div class="tv" id="tv-calendar">
+        <div class="th"><h2>📅 Контент-план <span class="new-tag">УНИКАЛЬНО</span></h2><p>AI составит расписание публикаций на месяц</p></div>
+        <div class="fg">
+          <div class="fgp"><label>Продукт / бизнес</label><input type="text" id="cal-pr" placeholder="Интернет-магазин одежды"></div>
+          <div class="fgp"><label>Основная платформа</label><select id="cal-pl"><option>Instagram</option><option>VK</option><option>Telegram</option><option>TikTok</option><option>Facebook</option></select></div>
+        </div>
+        <div class="fg" style="margin-top:12px">
+          <div class="fgp"><label>Целевая аудитория</label><input type="text" id="cal-au" placeholder="Женщины 20-35, мода и стиль"></div>
+          <div class="fgp"><label>Кол-во постов в неделю</label><select id="cal-freq"><option value="3">3 раза</option><option value="5">5 раз</option><option value="7">Каждый день</option></select></div>
+        </div>
+        <button class="run-btn" onclick="runCalendar()">📅 Создать контент-план</button>
+        <div id="cal-out" style="display:none;margin-top:18px">
+          <div class="cal-grid" id="cal-grid"></div>
+          <div class="out-actions" style="margin-top:14px">
+            <button class="ab" onclick="exportCalendar()">📥 Экспорт в текст</button>
+            <button class="ab" onclick="saveH('Контент-план',calendarText)">💾 Сохранить</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- COPY -->
+      <div class="tv" id="tv-copy">
+        <div class="th"><h2>✍️ Генератор текстов</h2><p>Продающие объявления для любой платформы</p></div>
+        <div class="fg">
+          <div class="fgp"><label>Продукт / услуга</label><input type="text" id="cp-pr" placeholder="Онлайн-курс по маркетингу"></div>
+          <div class="fgp"><label>Платформа</label><select id="cp-pl"><option>Facebook/Instagram</option><option>Google Ads</option><option>VK</option><option>Яндекс Директ</option><option>TikTok</option><option>Telegram</option><option>LinkedIn</option></select></div>
+        </div>
+        <div class="fg" style="margin-top:12px">
+          <div class="fgp"><label>Аудитория</label><input type="text" id="cp-au" placeholder="Предприниматели 25-45 лет"></div>
+          <div class="fgp"><label>Главная выгода</label><input type="text" id="cp-ut" placeholder="Результат за 30 дней"></div>
+        </div>
+        <div class="fgp" style="margin-top:12px"><label>Цель</label>
+          <div class="chips" id="cp-goal"><button class="ch on" onclick="oneC(this,'cp-goal')">Клики</button><button class="ch" onclick="oneC(this,'cp-goal')">Заявки</button><button class="ch" onclick="oneC(this,'cp-goal')">Продажи</button><button class="ch" onclick="oneC(this,'cp-goal')">Подписки</button></div>
+        </div>
+        <div class="fgp" style="margin-top:12px"><label>Тон</label>
+          <div class="chips" id="cp-tone"><button class="ch on" onclick="oneC(this,'cp-tone')">Убедительный</button><button class="ch" onclick="oneC(this,'cp-tone')">Дружелюбный</button><button class="ch" onclick="oneC(this,'cp-tone')">Срочность</button><button class="ch" onclick="oneC(this,'cp-tone')">Экспертный</button><button class="ch" onclick="oneC(this,'cp-tone')">Сторителлинг</button></div>
+        </div>
+        <button class="run-btn" onclick="runCopy()">⚡ Сгенерировать</button>
+        <div class="out" id="out-copy">
+          <div class="out-lbl">Готовый текст</div>
+          <div class="out-txt" id="res-copy"></div>
+          <div class="out-actions">
+            <button class="ab" onclick="cpClip('res-copy')">📋 Копировать</button>
+            <button class="ab" onclick="saveH('Текст',document.getElementById('res-copy').innerText)">💾 Сохранить</button>
+            <button class="ab pr" onclick="runCopy()">↻ Новый</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- HEADLINES -->
+      <div class="tv" id="tv-headlines">
+        <div class="th"><h2>⚡ Заголовки + оценка</h2><p>5 вариантов с AI-оценкой эффективности</p></div>
+        <div class="fg">
+          <div class="fgp"><label>Продукт / тема</label><input type="text" id="hl-pr" placeholder="Доставка цветов"></div>
+          <div class="fgp"><label>Ключевая выгода</label><input type="text" id="hl-ut" placeholder="За 2 часа по всему городу"></div>
+        </div>
+        <div class="fgp" style="margin-top:12px"><label>Стиль</label>
+          <div class="chips" id="hl-style"><button class="ch on" onclick="oneC(this,'hl-style')">Цифры</button><button class="ch" onclick="oneC(this,'hl-style')">Вопрос</button><button class="ch" onclick="oneC(this,'hl-style')">Боль→решение</button><button class="ch" onclick="oneC(this,'hl-style')">Интрига</button><button class="ch" onclick="oneC(this,'hl-style')">Смешанный</button></div>
+        </div>
+        <button class="run-btn" onclick="runHL()">⚡ 5 заголовков</button>
+        <div id="hl-out" style="display:none;margin-top:18px"><div class="vars" id="hl-vars"></div></div>
+      </div>
+
+      <!-- AUDIENCE -->
+      <div class="tv" id="tv-audience">
+        <div class="th"><h2>🎯 Анализ аудитории</h2><p>Детальный портрет ЦА за секунды</p></div>
+        <div class="fgp"><label>Опишите продукт/бизнес</label><textarea id="au-desc" rows="3" placeholder="Онлайн-школа йоги для занятых женщин..."></textarea></div>
+        <div class="fg" style="margin-top:12px">
+          <div class="fgp"><label>Ценовой сегмент</label><select id="au-price"><option>Масс-маркет (до 1000₽)</option><option>Средний (1000–5000₽)</option><option>Премиум (5000–20000₽)</option><option>Люкс (от 20000₽)</option></select></div>
+          <div class="fgp"><label>Гео</label><input type="text" id="au-geo" placeholder="Россия, Москва..."></div>
+        </div>
+        <div class="fgp" style="margin-top:12px"><label>Формат</label>
+          <div class="chips" id="au-fmt"><button class="ch on" onclick="oneC(this,'au-fmt')">Полный портрет</button><button class="ch" onclick="oneC(this,'au-fmt')">Боли</button><button class="ch" onclick="oneC(this,'au-fmt')">Где искать</button><button class="ch" onclick="oneC(this,'au-fmt')">Как говорить</button></div>
+        </div>
+        <button class="run-btn" onclick="runAud()">🎯 Проанализировать</button>
+        <div class="out" id="out-aud">
+          <div class="out-lbl">Портрет аудитории</div>
+          <div class="out-txt" id="res-aud"></div>
+          <div class="out-actions">
+            <button class="ab" onclick="cpClip('res-aud')">📋 Копировать</button>
+            <button class="ab" onclick="saveH('Аудитория',document.getElementById('res-aud').innerText)">💾 Сохранить</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TEMPLATES -->
+      <div class="tv" id="tv-templates">
+        <div class="th"><h2>📋 Шаблоны по нишам</h2><p>Выберите нишу — готовый текст за 1 клик</p></div>
+        <div class="tpl-grid" id="tpl-grid"></div>
+        <div id="tpl-form" style="display:none">
+          <div class="fg">
+            <div class="fgp"><label>Название / бренд</label><input type="text" id="tpl-brand" placeholder="Название бизнеса"></div>
+            <div class="fgp"><label>Город / гео</label><input type="text" id="tpl-geo" placeholder="Москва, Россия..."></div>
+          </div>
+          <div class="fgp" style="margin-top:12px"><label>Ваше преимущество</label><input type="text" id="tpl-utp" placeholder="Что отличает вас от конкурентов?"></div>
+          <button class="run-btn" onclick="runTpl()">📋 Создать по шаблону</button>
+        </div>
+        <div class="out" id="out-tpl">
+          <div class="out-lbl">Готовый текст</div>
+          <div class="out-txt" id="res-tpl"></div>
+          <div class="out-actions">
+            <button class="ab" onclick="cpClip('res-tpl')">📋 Копировать</button>
+            <button class="ab pr" onclick="runTpl()">↻ Новый</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMPETITOR -->
+      <div class="tv" id="tv-competitor">
+        <div class="th"><h2>🕵️ Анализ конкурентов</h2><p>Стратегия обхода конкурентов в вашей нише</p></div>
+        <div class="fg">
+          <div class="fgp"><label>Ваша ниша / продукт</label><input type="text" id="comp-niche" placeholder="Доставка цветов в Москве"></div>
+          <div class="fgp"><label>Конкуренты (необязательно)</label><input type="text" id="comp-names" placeholder="Florist, Цветов.ру..."></div>
+        </div>
+        <div class="fgp" style="margin-top:12px"><label>Ваши преимущества</label><input type="text" id="comp-adv" placeholder="Быстрая доставка, уникальные букеты..."></div>
+        <div class="fgp" style="margin-top:12px"><label>Что хотите узнать</label>
+          <div class="chips" id="comp-fmt">
+            <button class="ch on" onclick="oneC(this,'comp-fmt')">Полный анализ</button>
+            <button class="ch" onclick="oneC(this,'comp-fmt')">Слабые места</button>
+            <button class="ch" onclick="oneC(this,'comp-fmt')">Рекламная стратегия</button>
+            <button class="ch" onclick="oneC(this,'comp-fmt')">УТП и позиционирование</button>
+          </div>
+        </div>
+        <button class="run-btn" onclick="runComp()">🕵️ Проанализировать</button>
+        <div class="out" id="out-comp">
+          <div class="out-lbl">Анализ конкурентов</div>
+          <div class="out-txt" id="res-comp"></div>
+          <div class="out-actions">
+            <button class="ab" onclick="cpClip('res-comp')">📋 Копировать</button>
+            <button class="ab" onclick="saveH('Конкуренты',document.getElementById('res-comp').innerText)">💾 Сохранить</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- UTM -->
+      <div class="tv" id="tv-utm">
+        <div class="th"><h2>🔗 UTM-конструктор</h2><p>Ссылки для отслеживания трафика</p></div>
+        <div class="fgp"><label>URL сайта</label><input type="text" id="u-url" placeholder="https://example.com" oninput="bldUTM()"></div>
+        <div class="fgp" style="margin-top:12px"><label>Шаблоны</label>
+          <div class="chips"><button class="ch" onclick="setUTM('google','cpc')">Google</button><button class="ch" onclick="setUTM('facebook','cpc')">Facebook</button><button class="ch" onclick="setUTM('instagram','social')">Instagram</button><button class="ch" onclick="setUTM('vk','cpc')">VK</button><button class="ch" onclick="setUTM('yandex','cpc')">Яндекс</button><button class="ch" onclick="setUTM('telegram','messenger')">Telegram</button><button class="ch" onclick="setUTM('tiktok','social')">TikTok</button></div>
+        </div>
+        <div class="fg" style="margin-top:12px">
+          <div class="fgp"><label>utm_source</label><input type="text" id="u-src" placeholder="google" oninput="bldUTM()"></div>
+          <div class="fgp"><label>utm_medium</label><input type="text" id="u-med" placeholder="cpc" oninput="bldUTM()"></div>
+        </div>
+        <div class="fg" style="margin-top:8px">
+          <div class="fgp"><label>utm_campaign</label><input type="text" id="u-cam" placeholder="summer_sale" oninput="bldUTM()"></div>
+          <div class="fgp"><label>utm_content</label><input type="text" id="u-con" placeholder="banner_v1" oninput="bldUTM()"></div>
+        </div>
+        <div class="fgp" style="margin-top:8px"><label>utm_term</label><input type="text" id="u-term" placeholder="ключевое слово" oninput="bldUTM()"></div>
+        <div class="utm-res" id="utm-res"></div>
+        <div class="out-actions" id="utm-act" style="display:none;margin-top:10px"><button class="ab" onclick="cpUTM()">📋 Копировать ссылку</button></div>
+      </div>
+
+      <!-- BUDGET -->
+      <div class="tv" id="tv-budget">
+        <div class="th"><h2>💰 Калькулятор бюджета</h2><p>Прогноз кликов, лидов и ROI</p></div>
+        <div class="fgp"><label>Бюджет в месяц: <strong id="bv" style="color:var(--p3)">30 000 ₽</strong></label>
+          <input type="range" min="1000" max="500000" step="1000" value="30000" id="bsl" oninput="calcB()">
+          <div class="rl"><span>1 000 ₽</span><span>500 000 ₽</span></div>
+        </div>
+        <div class="fg" style="margin-top:12px">
+          <div class="fgp"><label>Платформа</label><select id="bpl" onchange="calcB()"><option value="0.25">Facebook/Instagram</option><option value="0.4">Google Ads</option><option value="0.15">VK</option><option value="0.35">Яндекс Директ</option><option value="0.1">TikTok</option></select></div>
+          <div class="fgp"><label>Конверсия сайта (%)</label><input type="number" id="bcv" value="2" min="0.1" max="100" step="0.1" oninput="calcB()"></div>
+        </div>
+        <div class="fgp" style="margin-top:8px"><label>Средний чек (₽)</label><input type="number" id="bch" value="3000" oninput="calcB()"></div>
+        <div class="calc-g">
+          <div class="cc"><div class="cc-val" id="cc-cpc" style="color:var(--p3)">—</div><div class="cc-lbl">Цена клика</div></div>
+          <div class="cc"><div class="cc-val" id="cc-cl" style="color:var(--g)">—</div><div class="cc-lbl">Кликов/мес</div></div>
+          <div class="cc"><div class="cc-val" id="cc-ld" style="color:var(--am)">—</div><div class="cc-lbl">Лидов/мес</div></div>
+          <div class="cc"><div class="cc-val" id="cc-roi" style="color:var(--pk)">—</div><div class="cc-lbl">ROI прогноз</div></div>
+        </div>
+        <button class="run-btn" onclick="runBudget()" style="margin-top:14px">🤖 Советы AI</button>
+        <div class="out" id="out-budget"><div class="out-lbl">Рекомендации</div><div class="out-txt" id="res-budget"></div></div>
+      </div>
+
+      <!-- CHAT -->
+      <div class="tv-full" id="tv-chat">
+        <div class="chat-msgs" id="chat-msgs"></div>
+        <div class="chat-sugs" id="chat-sugs">
+          <button class="sug" onclick="sendS(this)">Как снизить CPC?</button>
+          <button class="sug" onclick="sendS(this)">Ретаргетинг с нуля</button>
+          <button class="sug" onclick="sendS(this)">Google vs Facebook</button>
+          <button class="sug" onclick="sendS(this)">Как написать оффер?</button>
+          <button class="sug" onclick="sendS(this)">Какой бюджет для старта?</button>
+        </div>
+        <div class="chat-bottom">
+          <textarea class="cin" id="cin" placeholder="Спросите про рекламу..." rows="1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"
+            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+          <button class="csend" onclick="sendChat()">↑</button>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div class="tv" id="tv-history">
+        <div class="th"><h2>📂 История</h2><p>Сохранённые генерации</p></div>
+        <div id="hist-list"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bnav" id="bnav">
+  <button class="bni" onclick="sw('analyze')" id="bni-analyze"><div class="bni-ic">🔬</div>Анализ</button>
+  <button class="bni" onclick="sw('copy')" id="bni-copy"><div class="bni-ic">✍️</div>Тексты</button>
+  <button class="bni on" onclick="sw('chat')" id="bni-chat"><div class="bni-ic">🤖</div>AI Чат</button>
+  <button class="bni" onclick="sw('calendar')" id="bni-calendar"><div class="bni-ic">📅</div>Календарь</button>
+  <button class="bni" onclick="sw('budget')" id="bni-budget"><div class="bni-ic">💰</div>Бюджет</button>
+</div>
+
+<!-- PAY MODAL -->
+<div class="modal-bg" id="pay-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closePayModal()">✕</button>
+    <h2>👑 Про подписка</h2>
+    <div class="modal-sub">Безлимитные генерации, контент-план и история результатов</div>
+    <div class="plan-select" id="plan-select">
+      <div class="ps on" onclick="selPlan(this,'month',499)">
+        <div class="ps-name">Месяц</div>
+        <div class="ps-price">499₽</div>
+        <div class="ps-period">в месяц</div>
+      </div>
+      <div class="ps" onclick="selPlan(this,'quarter',1197)">
+        <div class="ps-name">3 месяца</div>
+        <div class="ps-price">399₽</div>
+        <div class="ps-period">в месяц</div>
+        <div class="ps-save">Экономия 25%</div>
+      </div>
+      <div class="ps" onclick="selPlan(this,'year',3588)">
+        <div class="ps-name">Год</div>
+        <div class="ps-price">299₽</div>
+        <div class="ps-period">в месяц</div>
+        <div class="ps-save">Экономия 40%</div>
+      </div>
+    </div>
+    <div class="pay-feats">
+      <div class="pf">Безлимитные AI-генерации</div>
+      <div class="pf">Контент-план на 30 дней</div>
+      <div class="pf">История всех генераций</div>
+      <div class="pf">Приоритетная скорость AI</div>
+      <div class="pf">Экспорт результатов</div>
+    </div>
+    <button class="pay-btn" onclick="goYukassa()">Оплатить через ЮKassa →</button>
+    <div class="pay-note">🔒 Безопасная оплата · Отмена в любой момент</div>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-bg" id="auth-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAuth()">✕</button>
+    <h2>Войти в AdCraft</h2>
+    <div class="modal-sub">Сохраняйте результаты и синхронизируйте между устройствами</div>
+    <div class="auth-tabs">
+      <button class="auth-tab on" onclick="authTab(this,'login')" id="tab-login">Войти</button>
+      <button class="auth-tab" onclick="authTab(this,'reg')" id="tab-reg">Регистрация</button>
+    </div>
+    <div id="auth-login">
+      <div class="auth-input-wrap"><label>Email</label><input type="email" id="auth-email" placeholder="your@email.com"></div>
+      <div class="auth-input-wrap"><label>Пароль</label><input type="password" id="auth-pass" placeholder="••••••••"></div>
+      <button class="pay-btn" onclick="doLogin()" style="margin-top:8px">Войти →</button>
+    </div>
+    <div id="auth-reg" style="display:none">
+      <div class="auth-input-wrap"><label>Имя</label><input type="text" id="auth-name" placeholder="Ваше имя"></div>
+      <div class="auth-input-wrap"><label>Email</label><input type="email" id="auth-email2" placeholder="your@email.com"></div>
+      <div class="auth-input-wrap"><label>Пароль</label><input type="password" id="auth-pass2" placeholder="••••••••"></div>
+      <button class="pay-btn" onclick="doReg()" style="margin-top:8px">Зарегистрироваться →</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- REKVIZITY MODAL -->
+<div class="modal-bg" id="rek-modal">
+  <div class="modal" style="max-width:520px">
+    <button class="modal-close" onclick="document.getElementById('rek-modal').classList.remove('on')">✕</button>
+    <h2>📄 Реквизиты</h2>
+    <div style="margin-top:20px;display:grid;gap:14px">
+      <div style="background:var(--s);border:1px solid var(--b2);border-radius:12px;padding:16px">
+        <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Наименование</div>
+        <div style="font-size:14px;color:var(--t);font-weight:500">ИП Лебедев Илья Алексеевич</div>
+      </div>
+      <div style="background:var(--s);border:1px solid var(--b2);border-radius:12px;padding:16px">
+        <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">ФИО</div>
+        <div style="font-size:14px;color:var(--t);font-weight:500">Лебедев Илья Алексеевич</div>
+      </div>
+      <div style="background:var(--s);border:1px solid var(--b2);border-radius:12px;padding:16px">
+        <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">ИНН</div>
+        <div style="font-size:14px;color:var(--t);font-weight:600;font-family:monospace">525017064800</div>
+      </div>
+      <div style="background:var(--s);border:1px solid var(--b2);border-radius:12px;padding:16px">
+        <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">ОГРНИП</div>
+        <div style="font-size:14px;color:var(--t);font-weight:600;font-family:monospace">325527500148611</div>
+      </div>
+      <div style="background:var(--s);border:1px solid var(--b2);border-radius:12px;padding:16px">
+        <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Сайт</div>
+        <div style="font-size:14px;color:var(--p3)">adcraft.ilyalebedev152.workers.dev</div>
+      </div>
+    </div>
+    <div style="margin-top:20px;font-size:12px;color:var(--t3);text-align:center;line-height:1.6">Оказание услуг осуществляется в соответствии с офертой.<br>Оплата производится через сервис ЮKassa.</div>
+  </div>
+</div>
+
+<script>
+const PROXY = 'https://noisy-tree-d442ai-proxy.ilyalebedev152.workers.dev';
+const SYS = 'Ты — эксперт по рекламе и маркетингу с 10-летним опытом. Google Ads, Meta, VK, Яндекс Директ, TikTok. Отвечай по-русски, конкретно, практично, без воды.';
+
+// ── STATE ──
+let chatHist = [], chatOn = false, calendarData = {}, calendarText = '';
+let selTplItem = null, selPayPlan = {name:'month',price:499};
+let user = null;
+let hist = [];
+try { hist = JSON.parse(localStorage.getItem('ac_h') || '[]'); } catch(e){}
+try { user = JSON.parse(localStorage.getItem('ac_user') || 'null'); } catch(e){}
+
+// FREE COUNTER
+function getToday(){ return new Date().toDateString(); }
+function getUsed(){
+  const d = JSON.parse(localStorage.getItem('ac_usage')||'{}');
+  if(d.date !== getToday()) return 0;
+  return d.count || 0;
+}
+function incUsed(){
+  if(isPro()) return;
+  const c = getUsed();
+  localStorage.setItem('ac_usage', JSON.stringify({date:getToday(), count:c+1}));
+  updateCounter();
+}
+function canGen(){
+  if(isPro()) return true;
+  return getUsed() < 10;
+}
+function isPro(){
+  try {
+    const p = JSON.parse(localStorage.getItem('ac_pro')||'null');
+    if(!p) return false;
+    return new Date(p.until) > new Date();
+  } catch(e){ return false; }
+}
+function updateCounter(){
+  const used = getUsed();
+  const limit = 10;
+  document.getElementById('counter-val').textContent = used + ' / ' + limit;
+  document.getElementById('counter-fill').style.width = Math.min(used/limit*100,100) + '%';
+  if(isPro()){
+    document.getElementById('sb-counter').style.display = 'none';
+  }
+}
+
+// ── NAV ──
+function goLand(){
+  document.getElementById('pg-land').classList.add('on');
+  document.getElementById('pg-app').classList.remove('on');
+  document.getElementById('bnav').style.display = 'none';
+  window.scrollTo(0,0);
+}
+function goApp(t){
+  document.getElementById('pg-land').classList.remove('on');
+  document.getElementById('pg-app').classList.add('on');
+  document.getElementById('bnav').style.display = 'grid';
+  sw(t);
+  if(t==='chat' && !chatOn){
+    chatOn = true;
+    addMsg('bot','Привет! 👋 Я рекламный эксперт на базе AI.\n\nЗадайте любой вопрос — помогу со стратегией, таргетингом, текстами и оптимизацией кампаний.');
+  }
+}
+function scrollTo(id){ document.querySelector(id)?.scrollIntoView({behavior:'smooth'}); }
+function togMob(){ document.getElementById('mob-menu').classList.toggle('on'); }
+
+function sw(t){
+  document.querySelectorAll('.tv,.tv-full').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.sbi').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.bni').forEach(b=>b.classList.remove('on'));
+  const tv = document.getElementById('tv-'+t);
+  if(tv) tv.classList.add('on');
+  ['si-','bni-'].forEach(p=>{ const el=document.getElementById(p+t); if(el) el.classList.add('on'); });
+  document.getElementById('app-content').scrollTo(0,0);
+  if(t==='history') renderHist();
+  if(t==='budget') calcB();
+  if(t==='templates') initTpl();
+  updateCounter();
+}
+
+// ── CHIPS ──
+function oneC(el,g){ document.querySelectorAll('#'+g+' .ch').forEach(c=>c.classList.remove('on')); el.classList.add('on'); }
+function togCh(el){ el.classList.toggle('on'); }
+function gC(g){ const s=document.querySelector('#'+g+' .ch.on'); return s?s.textContent.trim():''; }
+function gCs(g){ return [...document.querySelectorAll('#'+g+' .ch.on')].map(c=>c.textContent.trim()).join(', '); }
+
+// ── AI CALL ──
+async function ai(msgs, sys){
+  const r = await fetch(PROXY, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({model:'llama-3.3-70b-versatile', max_tokens:1200, system:sys||SYS, messages:msgs})
+  });
+  if(!r.ok){ const e=await r.json(); throw new Error(e.error?.message||'Ошибка '+r.status); }
+  const d = await r.json();
+  return d.content?.[0]?.text || 'Нет ответа';
+}
+
+function setLd(rid, oid){
+  const ob = document.getElementById(oid);
+  ob.classList.add('on');
+  document.getElementById(rid).innerHTML = '<div class="ld"><div class="sp"></div>Генерирую...</div>';
+}
+
+function checkLimit(){
+  if(!canGen()){
+    openPayModal();
+    toast('Лимит исчерпан — оформите Про для безлимита!');
+    return false;
+  }
+  return true;
+}
+
+// ── ANALYZE ──
+async function runAnalyze(){
+  if(!checkLimit()) return;
+  const txt = document.getElementById('an-txt').value.trim();
+  if(!txt){ toast('Вставьте текст объявления'); return; }
+  const plat = document.getElementById('an-plat').value;
+  const goal = document.getElementById('an-goal').value;
+  setLd('res-analyze','out-analyze');
+  document.getElementById('meter-wrap').innerHTML = '';
+  incUsed();
+  try{
+    const raw = await ai([{role:'user',content:`Проанализируй рекламное объявление для ${plat}${goal?', цель: '+goal:''}.
+
+ОБЪЯВЛЕНИЕ:
+${txt}
+
+Ответь ТОЛЬКО JSON (без markdown):
+{"scores":{"hook":72,"benefit":65,"cta":80,"trust":55,"emotion":70,"clarity":85},"overall":71,"verdict":"вывод 1-2 предложения","improvements":["улучшение 1","улучшение 2","улучшение 3","улучшение 4"],"rewrite":"улучшенная версия"}`}]);
+    const data = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    const labels = {hook:'Зацепка',benefit:'Выгода',cta:'Призыв',trust:'Доверие',emotion:'Эмоция',clarity:'Ясность'};
+    document.getElementById('meter-wrap').innerHTML = Object.entries(data.scores).map(([k,v])=>{
+      const c = v>=75?'var(--g)':v>=55?'var(--am)':'var(--rd)';
+      return `<div class="mc"><div class="mc-lbl">${labels[k]||k}</div><div class="mc-val" style="color:${c}">${v}<span style="font-size:.75rem;color:var(--t3)">/100</span></div><div class="mc-bar"><div class="mc-fill" style="width:${v}%;background:${c}"></div></div></div>`;
+    }).join('');
+    const oc = data.overall>=75?'var(--g)':data.overall>=55?'var(--am)':'var(--rd)';
+    document.getElementById('res-analyze').innerHTML = `<strong style="font-size:1.1rem;color:${oc}">Общая оценка: ${data.overall}/100</strong>\n\n📋 ${data.verdict}\n\n🔧 Что улучшить:\n${data.improvements.map((x,i)=>`${i+1}. ${x}`).join('\n')}\n\n✨ Улучшенная версия:\n\n${data.rewrite}`;
+  } catch(e){ document.getElementById('res-analyze').textContent = 'Ошибка: '+e.message; }
+}
+
+// ── FUNNEL ──
+async function runFunnel(){
+  if(!checkLimit()) return;
+  const pr = document.getElementById('fn-pr').value||'продукт';
+  const pl = document.getElementById('fn-pl').value;
+  const au = document.getElementById('fn-au').value||'широкая аудитория';
+  const stages = gCs('fn-chips');
+  const out = document.getElementById('fn-out');
+  const steps = document.getElementById('fn-steps');
+  out.style.display = 'block';
+  steps.innerHTML = '<div class="ld"><div class="sp"></div>Строю воронку...</div>';
+  incUsed();
+  try{
+    const raw = await ai([{role:'user',content:`Создай воронку рекламных объявлений для ${pl}.
+Продукт: ${pr}. Аудитория: ${au}. Этапы: ${stages}.
+ТОЛЬКО JSON массив (без markdown):
+[{"stage":"❄️ Холодная аудитория","goal":"цель","text":"готовый текст объявления"}]`}]);
+    const items = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    steps.innerHTML = items.map((it,i)=>`
+      <div class="fn-step">
+        <div class="fn-lbl">${it.stage}</div>
+        <div class="fn-goal">Цель: ${it.goal}</div>
+        <div class="fn-txt">${it.text}</div>
+        <div class="out-actions" style="margin-top:10px">
+          <button class="ab" onclick="navigator.clipboard.writeText(this.closest('.fn-step').querySelector('.fn-txt').textContent);toast('Скопировано!')">📋 Копировать</button>
+          <button class="ab" onclick="saveH('Воронка',this.closest('.fn-step').querySelector('.fn-txt').textContent)">💾 Сохранить</button>
+        </div>
+      </div>
+      ${i<items.length-1?'<div class="fn-arr">↓</div>':''}
+    `).join('');
+  } catch(e){ steps.innerHTML = '<div style="color:var(--t2);padding:12px">Ошибка: '+e.message+'</div>'; }
+}
+
+// ── CALENDAR ──
+async function runCalendar(){
+  if(!checkLimit()) return;
+  const pr = document.getElementById('cal-pr').value||'бизнес';
+  const pl = document.getElementById('cal-pl').value;
+  const au = document.getElementById('cal-au').value||'широкая аудитория';
+  const freq = parseInt(document.getElementById('cal-freq').value)||3;
+  const grid = document.getElementById('cal-grid');
+  const out = document.getElementById('cal-out');
+  out.style.display = 'block';
+  grid.innerHTML = '<div class="ld"><div class="sp"></div>Создаю контент-план...</div>';
+  incUsed();
+  try{
+    const raw = await ai([{role:'user',content:`Создай контент-план на месяц (30 дней) для ${pl}.
+Бизнес: ${pr}. Аудитория: ${au}. Частота: ${freq} поста в неделю.
+Создай посты только для дней когда есть публикация.
+ТОЛЬКО JSON (без markdown):
+{"posts":[{"day":1,"topic":"тема","format":"Пост/Stories/Reels","text":"краткий текст 1-2 предложения"},...]}`}]);
+    const data = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    const postMap = {};
+    data.posts.forEach(p=>{ postMap[p.day] = p; });
+    calendarData = postMap;
+    calendarText = data.posts.map(p=>`День ${p.day} (${p.format}): ${p.topic}\n${p.text}`).join('\n\n');
+    const days = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+    grid.innerHTML = days.map(d=>`<div class="cal-head">${d}</div>`).join('');
+    // offset (assume month starts on Monday)
+    for(let i=1; i<=30; i++){
+      const post = postMap[i];
+      const div = document.createElement('div');
+      div.className = 'cal-day' + (post?' has-post':'');
+      div.innerHTML = `<div class="cal-day-num">${i}</div>`;
+      if(post){
+        div.innerHTML += `<div class="cal-post">${post.format}: ${post.topic}</div>`;
+        div.title = post.text;
+        div.onclick = ()=>{ toast(post.topic+': '+post.text); };
+      }
+      grid.appendChild(div);
+    }
+  } catch(e){ grid.innerHTML = '<div style="color:var(--t2);padding:12px">Ошибка: '+e.message+'</div>'; }
+}
+function exportCalendar(){
+  if(!calendarText){ toast('Сначала создайте контент-план'); return; }
+  navigator.clipboard.writeText(calendarText);
+  toast('Контент-план скопирован!');
+}
+
+// ── COPY ──
+async function runCopy(){
+  if(!checkLimit()) return;
+  const pr = document.getElementById('cp-pr').value||'продукт';
+  const pl = document.getElementById('cp-pl').value;
+  const au = document.getElementById('cp-au').value||'аудитория';
+  const ut = document.getElementById('cp-ut').value||'выгода';
+  const goal = gC('cp-goal'); const tone = gC('cp-tone');
+  setLd('res-copy','out-copy'); incUsed();
+  try{
+    const t = await ai([{role:'user',content:`Напиши рекламное объявление для ${pl}.
+Продукт: ${pr}. Аудитория: ${au}. УТП: ${ut}. Цель: ${goal}. Тон: ${tone}.
+Структура: хук → выгоды → CTA. Только текст.`}]);
+    document.getElementById('res-copy').textContent = t;
+  } catch(e){ document.getElementById('res-copy').textContent = 'Ошибка: '+e.message; }
+}
+
+// ── HEADLINES ──
+async function runHL(){
+  if(!checkLimit()) return;
+  const pr = document.getElementById('hl-pr').value||'продукт';
+  const ut = document.getElementById('hl-ut').value||'';
+  const style = gC('hl-style');
+  document.getElementById('hl-out').style.display = 'block';
+  document.getElementById('hl-vars').innerHTML = '<div class="ld"><div class="sp"></div>Генерирую...</div>';
+  incUsed();
+  try{
+    const raw = await ai([{role:'user',content:`5 заголовков для: ${pr}. Выгода: ${ut}. Стиль: ${style}.
+ТОЛЬКО JSON (без markdown): [{"text":"заголовок","score":85,"tip":"почему работает"}]`}]);
+    const items = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    document.getElementById('hl-vars').innerHTML = items.map((h,i)=>{
+      const c = h.score>=80?'var(--g)':h.score>=65?'var(--am)':'var(--t3)';
+      return `<div class="vc" onclick="this.classList.toggle('pk')">
+        <div class="vn">ВАРИАНТ ${i+1}</div>
+        <div class="vt">${h.text}</div>
+        <div class="vrow"><div class="vtip">${h.tip}</div><div class="vscore" style="color:${c}">${h.score}/100</div></div>
+        <div class="sbar"><div class="sfill" style="width:${h.score}%;background:${c}"></div></div>
+        <div class="out-actions" style="margin-top:10px">
+          <button class="ab" onclick="event.stopPropagation();navigator.clipboard.writeText(this.closest('.vc').querySelector('.vt').textContent);toast('Скопировано!')">📋 Копировать</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){ document.getElementById('hl-vars').innerHTML = 'Ошибка: '+e.message; }
+}
+
+// ── AUDIENCE ──
+async function runAud(){
+  if(!checkLimit()) return;
+  const desc = document.getElementById('au-desc').value||'продукт';
+  const price = document.getElementById('au-price').value;
+  const geo = document.getElementById('au-geo').value||'Россия';
+  const fmt = gC('au-fmt');
+  setLd('res-aud','out-aud'); incUsed();
+  const fmts = {'Полный портрет':'👤 Демография\n🧠 Психография\n😣 Боли (4 штуки)\n🎯 Мотивация\n📱 Где искать\n💬 Как говорить','Боли':'6-8 болей с триггерами для рекламы','Где искать':'Конкретные площадки, группы, время активности','Как говорить':'Слова-магниты, стиль, топ-3 оффера'};
+  try{
+    const t = await ai([{role:'user',content:`Продукт: ${desc}\nЦена: ${price}\nГео: ${geo}\n\n${fmts[fmt]||fmts['Полный портрет']}`}]);
+    document.getElementById('res-aud').textContent = t;
+  } catch(e){ document.getElementById('res-aud').textContent = 'Ошибка: '+e.message; }
+}
+
+// ── TEMPLATES ──
+const TPLS = [
+  {ic:'🏠',nm:'Недвижимость',p:'жилой комплекс/квартиры'},{ic:'💆',nm:'Салон красоты',p:'салон красоты/услуги'},
+  {ic:'🍕',nm:'Доставка еды',p:'доставка еды/ресторан'},{ic:'💪',nm:'Фитнес',p:'фитнес-клуб/тренировки'},
+  {ic:'📚',nm:'Онлайн-курсы',p:'онлайн-курсы/обучение'},{ic:'🚗',nm:'Авто',p:'автосервис/автомобили'},
+  {ic:'💊',nm:'Медицина',p:'медицинская клиника'},{ic:'👗',nm:'Одежда',p:'магазин одежды/мода'},
+  {ic:'🐕',nm:'Зоотовары',p:'зоомагазин/питомцы'},{ic:'✈️',nm:'Туризм',p:'турагентство/путёвки'},
+  {ic:'💻',nm:'IT',p:'IT-услуги/разработка'},{ic:'🏗️',nm:'Строительство',p:'строительство/ремонт'},
+  {ic:'📱',nm:'Приложение',p:'мобильное приложение'},{ic:'🌿',nm:'Экотовары',p:'эко-продукты/натуральное'},
+  {ic:'🎓',nm:'Репетитор',p:'репетитор/уроки'},{ic:'🔧',nm:'Ремонт',p:'мастер на дом/сантехника'},
+  {ic:'💈',nm:'Барбершоп',p:'барбершоп/стрижка'},{ic:'🌺',nm:'Цветы',p:'цветочный магазин'},
+  {ic:'🎮',nm:'Игры',p:'игровой клуб/развлечения'},{ic:'📦',nm:'WB/Ozon',p:'товары на маркетплейсе'},
+];
+function initTpl(){
+  const g = document.getElementById('tpl-grid');
+  if(g.innerHTML) return;
+  g.innerHTML = TPLS.map((t,i)=>`<div class="tpl-c" onclick="pickTpl(${i})" id="tc-${i}"><div class="tpl-ic">${t.ic}</div><div class="tpl-nm">${t.nm}</div></div>`).join('');
+}
+function pickTpl(i){
+  document.querySelectorAll('.tpl-c').forEach(c=>c.classList.remove('on'));
+  document.getElementById('tc-'+i).classList.add('on');
+  selTplItem = TPLS[i];
+  document.getElementById('tpl-form').style.display = 'block';
+  document.getElementById('tpl-form').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+async function runTpl(){
+  if(!selTplItem){ toast('Выберите нишу'); return; }
+  if(!checkLimit()) return;
+  const brand = document.getElementById('tpl-brand').value||selTplItem.nm;
+  const geo = document.getElementById('tpl-geo').value||'Россия';
+  const utp = document.getElementById('tpl-utp').value||'высокое качество';
+  setLd('res-tpl','out-tpl'); incUsed();
+  try{
+    const t = await ai([{role:'user',content:`Напиши рекламный текст для: ${selTplItem.p}.
+Бренд: ${brand}. Гео: ${geo}. Преимущество: ${utp}.
+Хук → выгоды → CTA. Только готовый текст.`}]);
+    document.getElementById('res-tpl').textContent = t;
+  } catch(e){ document.getElementById('res-tpl').textContent = 'Ошибка: '+e.message; }
+}
+
+// ── COMPETITOR ──
+async function runComp(){
+  if(!checkLimit()) return;
+  const niche = document.getElementById('comp-niche').value||'ниша';
+  const names = document.getElementById('comp-names').value;
+  const adv = document.getElementById('comp-adv').value;
+  const fmt = gC('comp-fmt');
+  setLd('res-comp','out-comp'); incUsed();
+  try{
+    const t = await ai([{role:'user',content:`Проведи анализ конкурентов: ${fmt}.
+Ниша: ${niche}${names?'. Конкуренты: '+names:''}.${adv?'\nПреимущества клиента: '+adv:''}
+Дай конкретные, практичные рекомендации с примерами.`}]);
+    document.getElementById('res-comp').textContent = t;
+  } catch(e){ document.getElementById('res-comp').textContent = 'Ошибка: '+e.message; }
+}
+
+// ── UTM ──
+function bldUTM(){
+  const url=document.getElementById('u-url').value.trim();
+  const src=document.getElementById('u-src').value.trim();
+  const med=document.getElementById('u-med').value.trim();
+  const cam=document.getElementById('u-cam').value.trim();
+  const con=document.getElementById('u-con').value.trim();
+  const term=document.getElementById('u-term').value.trim();
+  if(!url){document.getElementById('utm-res').style.display='none';document.getElementById('utm-act').style.display='none';return}
+  const p=[];
+  if(src)p.push('utm_source='+encodeURIComponent(src));
+  if(med)p.push('utm_medium='+encodeURIComponent(med));
+  if(cam)p.push('utm_campaign='+encodeURIComponent(cam));
+  if(con)p.push('utm_content='+encodeURIComponent(con));
+  if(term)p.push('utm_term='+encodeURIComponent(term));
+  const full=p.length?url+(url.includes('?')?'&':'?')+p.join('&'):url;
+  document.getElementById('utm-res').textContent=full;
+  document.getElementById('utm-res').style.display='block';
+  document.getElementById('utm-act').style.display='flex';
+}
+function setUTM(s,m){document.getElementById('u-src').value=s;document.getElementById('u-med').value=m;bldUTM()}
+function cpUTM(){navigator.clipboard.writeText(document.getElementById('utm-res').textContent);toast('Ссылка скопирована!')}
+
+// ── BUDGET ──
+function calcB(){
+  const b=parseInt(document.getElementById('bsl').value)||30000;
+  const cm=parseFloat(document.getElementById('bpl').value)||0.25;
+  const cv=(parseFloat(document.getElementById('bcv').value)||2)/100;
+  const ch=parseFloat(document.getElementById('bch').value)||3000;
+  document.getElementById('bv').textContent=b.toLocaleString('ru')+' ₽';
+  const cpc=Math.round(b*cm/100*(0.9+Math.random()*.2));
+  const cl=Math.round(b/Math.max(cpc,1));
+  const ld=Math.round(cl*cv);
+  const roi=Math.round((ld*ch-b)/b*100);
+  document.getElementById('cc-cpc').textContent=cpc.toLocaleString('ru')+' ₽';
+  document.getElementById('cc-cl').textContent=cl.toLocaleString('ru');
+  document.getElementById('cc-ld').textContent=ld.toLocaleString('ru');
+  document.getElementById('cc-roi').textContent=(roi>0?'+':'')+roi+'%';
+  document.getElementById('cc-roi').style.color=roi>0?'var(--g)':'var(--rd)';
+}
+async function runBudget(){
+  if(!checkLimit()) return;
+  const b=document.getElementById('bsl').value;
+  const pl=document.getElementById('bpl').options[document.getElementById('bpl').selectedIndex].text;
+  const ob=document.getElementById('out-budget');ob.classList.add('on');
+  document.getElementById('res-budget').innerHTML='<div class="ld"><div class="sp"></div>Анализирую...</div>';
+  incUsed();
+  try{
+    const t=await ai([{role:'user',content:`Бюджет ${parseInt(b).toLocaleString('ru')} ₽/мес, платформа: ${pl}. 5 советов по оптимизации с эмодзи.`}]);
+    document.getElementById('res-budget').textContent=t;
+  } catch(e){document.getElementById('res-budget').textContent='Ошибка: '+e.message;}
+}
+
+// ── CHAT ──
+function addMsg(role,text){
+  const el=document.getElementById('chat-msgs');
+  const d=document.createElement('div');
+  d.className='mr '+role;
+  const isBot=role==='bot';
+  d.innerHTML=`<div class="mav ${isBot?'bot':'usr'}">${isBot?'AI':'Вы'}</div><div class="mb">${text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>`;
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+function showTd(){
+  const el=document.getElementById('chat-msgs');
+  const d=document.createElement('div');d.className='mr bot';d.id='tdot';
+  d.innerHTML='<div class="mav bot">AI</div><div class="mb"><div class="td"><span></span><span></span><span></span></div></div>';
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+async function sendChat(){
+  if(!checkLimit()) return;
+  const inp=document.getElementById('cin');
+  const text=inp.value.trim();
+  if(!text)return;
+  inp.value='';inp.style.height='auto';
+  document.getElementById('chat-sugs').style.display='none';
+  addMsg('user',text);
+  chatHist.push({role:'user',content:text});
+  showTd(); incUsed();
+  try{
+    const r=await fetch(PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:1200,system:SYS,messages:chatHist})});
+    if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'Ошибка '+r.status)}
+    const d=await r.json();
+    const reply=d.content?.[0]?.text||'Нет ответа';
+    document.getElementById('tdot')?.remove();
+    addMsg('bot',reply);
+    chatHist.push({role:'assistant',content:reply});
+  } catch(e){
+    document.getElementById('tdot')?.remove();
+    addMsg('bot','⚠️ '+e.message);
+  }
+}
+function sendS(el){document.getElementById('cin').value=el.textContent;sendChat()}
+
+// ── HISTORY ──
+function saveH(type,text){
+  if(!text||text.length<10)return;
+  hist.unshift({type,text,time:new Date().toLocaleString('ru')});
+  if(hist.length>60)hist.pop();
+  try{localStorage.setItem('ac_h',JSON.stringify(hist))}catch(e){}
+  toast('Сохранено!');
+}
+function renderHist(){
+  const el=document.getElementById('hist-list');
+  if(!hist.length){el.innerHTML='<div style="text-align:center;padding:50px;color:var(--t3);font-size:13px">📂 История пуста<br>Нажимайте «Сохранить» чтобы добавлять</div>';return}
+  el.innerHTML=hist.map((h,i)=>`<div class="hi" onclick="navigator.clipboard.writeText(hist[${i}].text);toast('Скопировано!')"><div class="hi-type">${h.type}</div><div class="hi-txt">${h.text}</div><div class="hi-time">📋 Нажмите чтобы скопировать · ${h.time}</div></div>`).join('');
+}
+
+// ── PAYMENT ──
+function openPayModal(plan){
+  document.getElementById('pay-modal').classList.add('on');
+}
+function closePayModal(){ document.getElementById('pay-modal').classList.remove('on'); }
+function selPlan(el,name,price){
+  document.querySelectorAll('.ps').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  selPayPlan = {name,price};
+}
+function goYukassa(){
+  // ЮKassa интеграция — здесь нужно подставить ваш shopId и создать платёж через backend
+  // Для демо показываем инструкцию
+  toast('Для приёма платежей настройте ЮKassa: yukassa.ru');
+  setTimeout(()=>{
+    // Симуляция успешной оплаты для демо
+    const until = new Date();
+    until.setMonth(until.getMonth() + (selPayPlan.name==='year'?12:selPayPlan.name==='quarter'?3:1));
+    localStorage.setItem('ac_pro', JSON.stringify({plan:selPayPlan.name, until:until.toISOString()}));
+    closePayModal();
+    updateCounter();
+    toast('✅ Подписка активирована! (демо)');
+  }, 2000);
+}
+
+// ── AUTH ──
+function openAuth(){
+  if(user){ toast('Вы вошли как '+user.name); return; }
+  document.getElementById('auth-modal').classList.add('on');
+}
+function closeAuth(){ document.getElementById('auth-modal').classList.remove('on'); }
+function authTab(el,tab){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('auth-login').style.display = tab==='login'?'block':'none';
+  document.getElementById('auth-reg').style.display = tab==='reg'?'block':'none';
+}
+function doLogin(){
+  const email = document.getElementById('auth-email').value;
+  const pass = document.getElementById('auth-pass').value;
+  if(!email||!pass){ toast('Заполните все поля'); return; }
+  user = {name:email.split('@')[0], email};
+  localStorage.setItem('ac_user', JSON.stringify(user));
+  updateNavUser();
+  closeAuth();
+  toast('Добро пожаловать, '+user.name+'!');
+}
+function doReg(){
+  const name = document.getElementById('auth-name').value;
+  const email = document.getElementById('auth-email2').value;
+  const pass = document.getElementById('auth-pass2').value;
+  if(!name||!email||!pass){ toast('Заполните все поля'); return; }
+  user = {name, email};
+  localStorage.setItem('ac_user', JSON.stringify(user));
+  updateNavUser();
+  closeAuth();
+  toast('Добро пожаловать, '+name+'!');
+}
+function updateNavUser(){
+  if(!user) return;
+  document.getElementById('nav-avatar').textContent = user.name[0].toUpperCase();
+  document.getElementById('nav-name').textContent = user.name;
+  if(isPro()){
+    const badge = document.createElement('div');
+    badge.className = 'nav-pro-badge';
+    badge.textContent = 'PRO';
+    document.getElementById('nav-user-area').appendChild(badge);
+  }
+}
+
+// ── UTILS ──
+function cpClip(id){ navigator.clipboard.writeText(document.getElementById(id).textContent||document.getElementById(id).innerText); toast('Скопировано!'); }
+function toast(msg){ const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2600); }
+
+// CLOSE MODALS ON BG CLICK
+document.getElementById('pay-modal').addEventListener('click',e=>{if(e.target===document.getElementById('pay-modal'))closePayModal()});
+document.getElementById('auth-modal').addEventListener('click',e=>{if(e.target===document.getElementById('auth-modal'))closeAuth()});
+
+function showRekvizity(){document.getElementById("rek-modal").classList.add("on")}
+document.getElementById("rek-modal").addEventListener("click",e=>{if(e.target===document.getElementById("rek-modal"))document.getElementById("rek-modal").classList.remove("on")})
+
+// INIT
+calcB(); initTpl(); updateCounter();
+if(user) updateNavUser();
+</script>
+</body>
+</html>
