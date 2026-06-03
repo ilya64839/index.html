@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AdCraft AI — Платформа рекламного контента</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #111118;
+    --bg3: #16161f;
+    --surface: #1c1c28;
+    --surface2: #222233;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --accent: #7c5cfc;
+    --accent2: #a78bfa;
+    --accent3: #c4b5fd;
+    --teal: #2dd4bf;
+    --pink: #f472b6;
+    --amber: #fbbf24;
+    --text: #f1f0ff;
+    --text2: #a09cc0;
+    --text3: #6b6890;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --glow: 0 0 40px rgba(124,92,252,0.15);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,92,252,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,92,252,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 0 2rem;
+    height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.25rem; font-weight: 800;
+    display: flex; align-items: center; gap: 8px;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+  .nav-tabs {
+    display: flex; gap: 2px;
+    background: var(--surface); border-radius: 10px; padding: 3px;
+    border: 1px solid var(--border);
+  }
+  .nav-tab {
+    padding: 6px 16px; border-radius: 7px; font-size: 13px; font-weight: 500;
+    color: var(--text3); cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    border: none; background: transparent; font-family: 'DM Sans', sans-serif;
+  }
+  .nav-tab:hover { color: var(--text2); }
+  .nav-tab.active { background: var(--accent); color: #fff; box-shadow: 0 2px 12px rgba(124,92,252,0.4); }
+  .nav-badge {
+    font-size: 11px; background: var(--accent); color: #fff;
+    padding: 2px 7px; border-radius: 20px; font-weight: 600;
+  }
+
+  /* MAIN */
+  main { padding-top: 60px; position: relative; z-index: 1; }
+
+  /* SECTIONS */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* HERO */
+  .hero {
+    padding: 80px 2rem 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-glow {
+    position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 400px;
+    background: radial-gradient(ellipse, rgba(124,92,252,0.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(124,92,252,0.1); border: 1px solid rgba(124,92,252,0.3);
+    color: var(--accent3); font-size: 12px; font-weight: 500;
+    padding: 5px 12px; border-radius: 20px; margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800;
+    line-height: 1.1; margin-bottom: 16px;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent2), var(--teal));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero p { font-size: 1.05rem; color: var(--text2); max-width: 540px; margin: 0 auto 32px; line-height: 1.6; }
+  .hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    padding: 12px 28px; border-radius: 10px; font-size: 14px; font-weight: 600;
+    background: var(--accent); color: #fff; border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    box-shadow: 0 4px 24px rgba(124,92,252,0.4);
+    transition: all 0.2s;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 32px rgba(124,92,252,0.5); }
+  .btn-secondary {
+    padding: 12px 28px; border-radius: 10px; font-size: 14px; font-weight: 500;
+    background: var(--surface); color: var(--text2); border: 1px solid var(--border2); cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent3); }
+
+  /* STATS */
+  .stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    max-width: 600px; margin: 48px auto 0; gap: 1px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    overflow: hidden; background: var(--border);
+  }
+  .stat { background: var(--surface); padding: 20px; text-align: center; }
+  .stat-num { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--text); }
+  .stat-label { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+  /* TOOLS GRID */
+  .tools-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px; padding: 40px 2rem; max-width: 1200px; margin: 0 auto;
+  }
+  .tool-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px; cursor: pointer;
+    transition: all 0.25s; position: relative; overflow: hidden;
+  }
+  .tool-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(124,92,252,0.05), transparent);
+    opacity: 0; transition: opacity 0.25s;
+  }
+  .tool-card:hover { border-color: rgba(124,92,252,0.4); transform: translateY(-2px); box-shadow: var(--glow); }
+  .tool-card:hover::before { opacity: 1; }
+  .tool-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin-bottom: 14px;
+  }
+  .tool-card h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+  .tool-card p { font-size: 13px; color: var(--text2); line-height: 1.5; }
+  .tool-arrow {
+    position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+    color: var(--text3); font-size: 18px; transition: all 0.2s;
+  }
+  .tool-card:hover .tool-arrow { color: var(--accent); transform: translateY(-50%) translateX(3px); }
+
+  /* TOOL PANEL */
+  .tool-panel {
+    max-width: 860px; margin: 0 auto; padding: 20px 2rem 60px;
+  }
+  .panel-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 28px;
+  }
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--text3); font-size: 13px; cursor: pointer;
+    background: none; border: 1px solid var(--border); padding: 6px 12px;
+    border-radius: 8px; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .back-btn:hover { color: var(--text2); border-color: var(--border2); }
+  .panel-title { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 700; }
+
+  /* FORM ELEMENTS */
+  .form-group { margin-bottom: 18px; }
+  label { display: block; font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 7px; }
+  input[type="text"], input[type="number"], textarea, select {
+    width: 100%; background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: var(--radius-sm); padding: 10px 14px;
+    color: var(--text); font-size: 14px; font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.2s; resize: vertical;
+    outline: none;
+  }
+  input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+  select option { background: var(--bg3); }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media(max-width:600px) { .form-row { grid-template-columns: 1fr; } }
+
+  .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip-opt {
+    padding: 6px 14px; border-radius: 20px; font-size: 13px;
+    border: 1px solid var(--border2); color: var(--text2);
+    cursor: pointer; transition: all 0.2s; background: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .chip-opt:hover, .chip-opt.selected {
+    background: rgba(124,92,252,0.15); border-color: var(--accent); color: var(--accent3);
+  }
+
+  /* OUTPUT */
+  .output-box {
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: var(--radius); padding: 20px;
+    min-height: 120px; position: relative;
+  }
+  .output-label {
+    font-size: 11px; font-weight: 600; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px;
+  }
+  .output-content { font-size: 14px; line-height: 1.7; color: var(--text); white-space: pre-wrap; }
+  .output-actions { display: flex; gap: 8px; margin-top: 14px; }
+  .action-btn {
+    padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 500;
+    border: 1px solid var(--border2); color: var(--text2); cursor: pointer;
+    background: none; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .action-btn:hover { border-color: var(--accent); color: var(--accent3); }
+  .action-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .action-btn.primary:hover { background: var(--accent2); box-shadow: 0 2px 12px rgba(124,92,252,0.4); }
+
+  /* VARIANTS */
+  .variants-grid { display: grid; gap: 12px; margin-top: 16px; }
+  .variant-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 16px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .variant-card:hover { border-color: rgba(124,92,252,0.5); }
+  .variant-card.selected { border-color: var(--accent); background: rgba(124,92,252,0.08); }
+  .variant-num {
+    font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 6px;
+    font-family: 'Syne', sans-serif;
+  }
+  .variant-text { font-size: 14px; color: var(--text); line-height: 1.5; }
+  .variant-score {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; color: var(--teal); margin-top: 8px;
+  }
+
+  /* SCORE METER */
+  .score-bar { height: 4px; background: var(--surface2); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+  .score-fill { height: 100%; border-radius: 2px; transition: width 1s; }
+
+  /* LOADING */
+  .loading {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--text2); font-size: 13px;
+  }
+  .spinner {
+    width: 16px; height: 16px; border: 2px solid var(--border2);
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* CHAT */
+  .chat-container {
+    max-width: 720px; margin: 0 auto; padding: 20px 2rem 60px;
+    display: flex; flex-direction: column; height: calc(100vh - 120px);
+  }
+  .chat-messages {
+    flex: 1; overflow-y: auto; display: flex; flex-direction: column;
+    gap: 16px; padding-bottom: 20px;
+  }
+  .chat-messages::-webkit-scrollbar { width: 4px; }
+  .chat-messages::-webkit-scrollbar-track { background: transparent; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  .msg-wrap { display: flex; gap: 10px; max-width: 85%; }
+  .msg-wrap.user { align-self: flex-end; flex-direction: row-reverse; }
+  .msg-avatar {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; margin-top: 2px;
+  }
+  .bot-av { background: rgba(124,92,252,0.2); color: var(--accent3); font-family: 'Syne', sans-serif; }
+  .user-av { background: rgba(45,212,191,0.2); color: var(--teal); font-family: 'Syne', sans-serif; }
+  .msg-bubble {
+    padding: 11px 16px; border-radius: 14px; font-size: 14px;
+    line-height: 1.6; color: var(--text);
+  }
+  .msg-wrap.bot .msg-bubble {
+    background: var(--surface); border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+  }
+  .msg-wrap.user .msg-bubble {
+    background: var(--accent); border-bottom-right-radius: 4px;
+    color: #fff;
+  }
+  .chat-input-area {
+    display: flex; gap: 10px; align-items: flex-end;
+    padding: 12px 0;
+  }
+  .chat-input {
+    flex: 1; background: var(--surface); border: 1px solid var(--border2);
+    border-radius: 12px; padding: 11px 16px; font-size: 14px;
+    color: var(--text); font-family: 'DM Sans', sans-serif;
+    resize: none; outline: none; min-height: 44px; max-height: 120px;
+  }
+  .chat-input:focus { border-color: rgba(124,92,252,0.5); }
+  .chat-send {
+    width: 44px; height: 44px; border-radius: 50%; background: var(--accent);
+    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; transition: all 0.2s; flex-shrink: 0;
+    box-shadow: 0 2px 12px rgba(124,92,252,0.4);
+  }
+  .chat-send:hover { transform: scale(1.05); }
+  .chat-suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .sug-chip {
+    font-size: 12px; padding: 6px 12px; border-radius: 20px;
+    border: 1px solid var(--border2); color: var(--text2);
+    cursor: pointer; transition: all 0.2s; background: none; font-family: 'DM Sans', sans-serif;
+  }
+  .sug-chip:hover { border-color: var(--accent); color: var(--accent3); background: rgba(124,92,252,0.08); }
+
+  /* UTM BUILDER */
+  .utm-output {
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: var(--radius-sm); padding: 12px 16px;
+    font-family: monospace; font-size: 13px; color: var(--teal);
+    word-break: break-all; margin-top: 16px;
+  }
+
+  /* BUDGET CALC */
+  .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  @media(max-width:600px) { .calc-grid { grid-template-columns: 1fr; } }
+  .calc-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 16px; text-align: center;
+  }
+  .calc-val { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; }
+  .calc-label { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+  /* TYPING */
+  .typing-dots { display: flex; gap: 4px; padding: 4px 0; }
+  .typing-dots span {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--text3);
+    animation: blink 1.2s infinite;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,60%,100%{opacity:0.3} 30%{opacity:1} }
+
+  /* SECTION TITLE */
+  .section-title {
+    text-align: center; padding: 40px 2rem 0;
+  }
+  .section-title h2 { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; margin-bottom: 8px; }
+  .section-title p { font-size: 14px; color: var(--text2); }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--border); max-width: 1200px; margin: 0 auto; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 999;
+    background: var(--surface); border: 1px solid var(--border2);
+    color: var(--text); font-size: 13px; padding: 10px 18px;
+    border-radius: 10px; opacity: 0; transform: translateY(10px);
+    transition: all 0.3s; pointer-events: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* RANGE */
+  input[type="range"] {
+    -webkit-appearance: none; width: 100%; height: 4px;
+    background: var(--surface2); border-radius: 2px; outline: none;
+    border: none; padding: 0;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 16px; height: 16px;
+    border-radius: 50%; background: var(--accent); cursor: pointer;
+    box-shadow: 0 0 8px rgba(124,92,252,0.5);
+  }
+
+  .range-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text3); margin-top: 6px; }
+  .range-val { color: var(--accent3); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="#">
+    <div class="logo-dot"></div>
+    AdCraft AI
+  </a>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('home')">Главная</button>
+    <button class="nav-tab" onclick="showSection('copy')">Тексты</button>
+    <button class="nav-tab" onclick="showSection('headlines')">Заголовки</button>
+    <button class="nav-tab" onclick="showSection('audience')">Аудитория</button>
+    <button class="nav-tab" onclick="showSection('utm')">UTM</button>
+    <button class="nav-tab" onclick="showSection('budget')">Бюджет</button>
+    <button class="nav-tab" onclick="showSection('chat')">AI Чат <span class="nav-badge">AI</span></button>
+  </div>
+</nav>
+
+<main>
+  <!-- HOME -->
+  <div id="section-home" class="section active">
+    <div class="hero">
+      <div class="hero-glow"></div>
+      <div class="hero-tag">✦ Powered by Claude AI</div>
+      <h1>Создавайте рекламу<br>которая <span>продаёт</span></h1>
+      <p>Генератор текстов, заголовков, анализатор аудитории, UTM-конструктор и калькулятор бюджета — всё в одном инструменте.</p>
+      <div class="hero-cta">
+        <button class="btn-primary" onclick="showSection('copy')">Начать генерацию →</button>
+        <button class="btn-secondary" onclick="showSection('chat')">Спросить AI</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-num">6</div><div class="stat-label">AI инструментов</div></div>
+        <div class="stat"><div class="stat-num">10+</div><div class="stat-label">платформ</div></div>
+        <div class="stat"><div class="stat-num">∞</div><div class="stat-label">вариантов</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-title"><h2>Все инструменты</h2><p>Нажмите на любой чтобы начать</p></div>
+    <div class="tools-grid">
+      <div class="tool-card" onclick="showSection('copy')">
+        <div class="tool-icon" style="background:rgba(124,92,252,0.15);">✍️</div>
+        <h3>Генератор рекламных текстов</h3>
+        <p>Создайте продающий текст для любой платформы: Facebook, Google, Instagram, VK и других</p>
+        <div class="tool-arrow">→</div>
+      </div>
+      <div class="tool-card" onclick="showSection('headlines')">
+        <div class="tool-icon" style="background:rgba(251,191,36,0.15);">⚡</div>
+        <h3>Генератор заголовков + оценка силы</h3>
+        <p>5 вариантов заголовков с AI-оценкой эффективности и рекомендациями</p>
+        <div class="tool-arrow">→</div>
+      </div>
+      <div class="tool-card" onclick="showSection('audience')">
+        <div class="tool-icon" style="background:rgba(45,212,191,0.15);">🎯</div>
+        <h3>Анализатор целевой аудитории</h3>
+        <p>Детальный портрет ЦА: боли, интересы, платформы, время активности</p>
+        <div class="tool-arrow">→</div>
+      </div>
+      <div class="tool-card" onclick="showSection('utm')">
+        <div class="tool-icon" style="background:rgba(244,114,182,0.15);">🔗</div>
+        <h3>UTM-конструктор</h3>
+        <p>Стройте UTM-метки для отслеживания источников трафика</p>
+        <div class="tool-arrow">→</div>
+      </div>
+      <div class="tool-card" onclick="showSection('budget')">
+        <div class="tool-icon" style="background:rgba(45,212,191,0.15);">💰</div>
+        <h3>Калькулятор бюджета</h3>
+        <p>Рассчитайте оптимальный бюджет, прогнозируйте CPC и ROI</p>
+        <div class="tool-arrow">→</div>
+      </div>
+      <div class="tool-card" onclick="showSection('chat')">
+        <div class="tool-icon" style="background:rgba(124,92,252,0.15);">🤖</div>
+        <h3>AI Рекламный ассистент</h3>
+        <p>Задайте любой вопрос о рекламе — получите экспертный ответ</p>
+        <div class="tool-arrow">→</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COPY GENERATOR -->
+  <div id="section-copy" class="section">
+    <div class="tool-panel">
+      <div class="panel-header">
+        <button class="back-btn" onclick="showSection('home')">← Назад</button>
+        <div class="panel-title">✍️ Генератор рекламных текстов</div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Продукт / услуга</label>
+          <input type="text" id="copy-product" placeholder="Например: онлайн-курс по английскому">
+        </div>
+        <div class="form-group">
+          <label>Платформа</label>
+          <select id="copy-platform">
+            <option>Facebook / Instagram</option>
+            <option>Google Ads</option>
+            <option>VK</option>
+            <option>Яндекс Директ</option>
+            <option>TikTok</option>
+            <option>Telegram</option>
+            <option>LinkedIn</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Целевая аудитория</label>
+          <input type="text" id="copy-audience" placeholder="Например: мамы 25-35 лет">
+        </div>
+        <div class="form-group">
+          <label>Основная выгода</label>
+          <input type="text" id="copy-benefit" placeholder="Например: за 3 месяца до B2">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Тон</label>
+        <div class="chip-group" id="copy-tone-chips">
+          <button class="chip-opt selected" onclick="selectChip(this,'copy-tone-chips')">Убедительный</button>
+          <button class="chip-opt" onclick="selectChip(this,'copy-tone-chips')">Дружелюбный</button>
+          <button class="chip-opt" onclick="selectChip(this,'copy-tone-chips')">Срочный</button>
+          <button class="chip-opt" onclick="selectChip(this,'copy-tone-chips')">Экспертный</button>
+          <button class="chip-opt" onclick="selectChip(this,'copy-tone-chips')">Эмоциональный</button>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="generateCopy()" style="width:100%;margin-top:8px">Сгенерировать текст →</button>
+
+      <div id="copy-output" style="margin-top:24px;display:none">
+        <div class="output-box">
+          <div class="output-label">Результат</div>
+          <div class="output-content" id="copy-result"></div>
+        </div>
+        <div class="output-actions">
+          <button class="action-btn" onclick="copyToClipboard('copy-result')">📋 Скопировать</button>
+          <button class="action-btn primary" onclick="generateCopy()">↻ Новый вариант</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADLINES -->
+  <div id="section-headlines" class="section">
+    <div class="tool-panel">
+      <div class="panel-header">
+        <button class="back-btn" onclick="showSection('home')">← Назад</button>
+        <div class="panel-title">⚡ Генератор заголовков</div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Продукт / тема</label>
+          <input type="text" id="hl-product" placeholder="Например: доставка цветов">
+        </div>
+        <div class="form-group">
+          <label>Ключевое слово / УТП</label>
+          <input type="text" id="hl-usp" placeholder="Например: за 2 часа по всему городу">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Стиль заголовков</label>
+        <div class="chip-group" id="hl-style-chips">
+          <button class="chip-opt selected" onclick="selectChip(this,'hl-style-chips')">Вопрос</button>
+          <button class="chip-opt" onclick="selectChip(this,'hl-style-chips')">Цифры</button>
+          <button class="chip-opt" onclick="selectChip(this,'hl-style-chips')">Боль → решение</button>
+          <button class="chip-opt" onclick="selectChip(this,'hl-style-chips')">Интрига</button>
+          <button class="chip-opt" onclick="selectChip(this,'hl-style-chips')">Выгода</button>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="generateHeadlines()" style="width:100%;margin-top:8px">Сгенерировать 5 заголовков →</button>
+      <div id="hl-output" style="margin-top:24px;display:none">
+        <div class="variants-grid" id="hl-variants"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUDIENCE -->
+  <div id="section-audience" class="section">
+    <div class="tool-panel">
+      <div class="panel-header">
+        <button class="back-btn" onclick="showSection('home')">← Назад</button>
+        <div class="panel-title">🎯 Анализатор целевой аудитории</div>
+      </div>
+      <div class="form-group">
+        <label>Опишите ваш продукт или бизнес</label>
+        <textarea id="aud-product" rows="3" placeholder="Например: онлайн-школа йоги для занятых женщин. Предлагаем утренние практики 15-20 минут..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ценовой сегмент</label>
+          <select id="aud-price">
+            <option>Масс-маркет (до 1000₽)</option>
+            <option>Средний (1000–5000₽)</option>
+            <option>Премиум (5000–20000₽)</option>
+            <option>Люкс (от 20000₽)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Гео</label>
+          <input type="text" id="aud-geo" placeholder="Россия, СНГ, Москва...">
+        </div>
+      </div>
+      <button class="btn-primary" onclick="generateAudience()" style="width:100%;margin-top:8px">Проанализировать аудиторию →</button>
+      <div id="aud-output" style="margin-top:24px;display:none">
+        <div class="output-box">
+          <div class="output-label">Портрет целевой аудитории</div>
+          <div class="output-content" id="aud-result"></div>
+        </div>
+        <div class="output-actions">
+          <button class="action-btn" onclick="copyToClipboard('aud-result')">📋 Скопировать</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UTM -->
+  <div id="section-utm" class="section">
+    <div class="tool-panel">
+      <div class="panel-header">
+        <button class="back-btn" onclick="showSection('home')">← Назад</button>
+        <div class="panel-title">🔗 UTM-конструктор</div>
+      </div>
+      <div class="form-group">
+        <label>URL сайта</label>
+        <input type="text" id="utm-url" placeholder="https://example.com/landing" oninput="buildUTM()">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>utm_source (источник)</label>
+          <input type="text" id="utm-source" placeholder="google, facebook, vk" oninput="buildUTM()">
+        </div>
+        <div class="form-group">
+          <label>utm_medium (канал)</label>
+          <input type="text" id="utm-medium" placeholder="cpc, banner, email" oninput="buildUTM()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>utm_campaign (кампания)</label>
+          <input type="text" id="utm-campaign" placeholder="summer_sale_2024" oninput="buildUTM()">
+        </div>
+        <div class="form-group">
+          <label>utm_content (объявление)</label>
+          <input type="text" id="utm-content" placeholder="banner_300x250" oninput="buildUTM()">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>utm_term (ключевое слово)</label>
+        <input type="text" id="utm-term" placeholder="купить цветы москва" oninput="buildUTM()">
+      </div>
+
+      <div class="form-group" style="margin-top:8px">
+        <label>Быстрые шаблоны</label>
+        <div class="chip-group">
+          <button class="chip-opt" onclick="fillUTM('google','cpc','','','')">Google Ads</button>
+          <button class="chip-opt" onclick="fillUTM('facebook','cpc','','','')">Facebook</button>
+          <button class="chip-opt" onclick="fillUTM('vk','cpc','','','')">VK</button>
+          <button class="chip-opt" onclick="fillUTM('instagram','social','','','')">Instagram</button>
+          <button class="chip-opt" onclick="fillUTM('telegram','messenger','','','')">Telegram</button>
+          <button class="chip-opt" onclick="fillUTM('yandex','cpc','','','')">Яндекс</button>
+        </div>
+      </div>
+
+      <div id="utm-result-box" style="display:none">
+        <div class="utm-output" id="utm-full-url"></div>
+        <div class="output-actions" style="margin-top:10px">
+          <button class="action-btn" onclick="copyUTM()">📋 Скопировать ссылку</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUDGET -->
+  <div id="section-budget" class="section">
+    <div class="tool-panel">
+      <div class="panel-header">
+        <button class="back-btn" onclick="showSection('home')">← Назад</button>
+        <div class="panel-title">💰 Калькулятор рекламного бюджета</div>
+      </div>
+
+      <div class="form-group">
+        <label>Месячный бюджет: <span class="range-val" id="budget-val">30 000 ₽</span></label>
+        <input type="range" min="1000" max="500000" step="1000" value="30000" id="budget-slider" oninput="calcBudget()">
+        <div class="range-label"><span>1 000 ₽</span><span>500 000 ₽</span></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Платформа</label>
+          <select id="budget-platform" onchange="calcBudget()">
+            <option value="0.25">Facebook / Instagram</option>
+            <option value="0.4">Google Ads (поиск)</option>
+            <option value="0.15">VK</option>
+            <option value="0.35">Яндекс Директ</option>
+            <option value="0.1">TikTok</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Конверсия сайта (%)</label>
+          <input type="number" id="budget-conv" value="2" min="0.1" max="100" step="0.1" oninput="calcBudget()">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Средний чек (₽)</label>
+        <input type="number" id="budget-check" value="3000" min="1" oninput="calcBudget()">
+      </div>
+
+      <div class="calc-grid" id="calc-results">
+        <div class="calc-card">
+          <div class="calc-val" id="calc-cpc" style="color:var(--accent2)">—</div>
+          <div class="calc-label">Ср. CPC (цена клика)</div>
+        </div>
+        <div class="calc-card">
+          <div class="calc-val" id="calc-clicks" style="color:var(--teal)">—</div>
+          <div class="calc-label">Кликов в месяц</div>
+        </div>
+        <div class="calc-card">
+          <div class="calc-val" id="calc-leads" style="color:var(--amber)">—</div>
+          <div class="calc-label">Заявок / лидов</div>
+        </div>
+        <div class="calc-card">
+          <div class="calc-val" id="calc-roi" style="color:var(--pink)">—</div>
+          <div class="calc-label">Прогноз ROI</div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px">
+        <button class="btn-primary" onclick="generateBudgetTips()" style="width:100%">Получить рекомендации AI →</button>
+      </div>
+      <div id="budget-tips" style="margin-top:16px;display:none">
+        <div class="output-box">
+          <div class="output-label">Рекомендации</div>
+          <div class="output-content" id="budget-tips-text"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="section-chat" class="section">
+    <div class="chat-container">
+      <div class="chat-suggestions" id="chat-sugs">
+        <button class="sug-chip" onclick="chatSuggest(this)">Как снизить CPC?</button>
+        <button class="sug-chip" onclick="chatSuggest(this)">Ретаргетинг — с чего начать?</button>
+        <button class="sug-chip" onclick="chatSuggest(this)">Google Ads vs Facebook: что выбрать?</button>
+        <button class="sug-chip" onclick="chatSuggest(this)">Как написать призыв к действию?</button>
+      </div>
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="chat-input-area">
+        <textarea class="chat-input" id="chat-input" placeholder="Спросите про рекламу..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"></textarea>
+        <button class="chat-send" onclick="sendChat()">↑</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = 'https://api.anthropic.com/v1/messages';
+const MODEL = 'claude-sonnet-4-20250514';
+const AD_SYSTEM = `Ты — эксперт по рекламе и маркетингу с 10-летним опытом. Специализация: Google Ads, Meta, VK, Яндекс Директ, TikTok, Telegram Ads. Помогаешь создавать рекламные материалы, анализировать аудитории и оптимизировать кампании. Отвечай по-русски, конкретно и практично.`;
+
+let chatHistory = [];
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('active');
+  const tabs = document.querySelectorAll('.nav-tab');
+  const map = {'home':0,'copy':1,'headlines':2,'audience':3,'utm':4,'budget':5,'chat':6};
+  if (map[id] !== undefined) tabs[map[id]].classList.add('active');
+  window.scrollTo(0, 0);
+  if (id === 'chat' && chatHistory.length === 0) {
+    addChatMsg('bot', 'Привет! Я рекламный ассистент. Задайте любой вопрос о настройке рекламы — помогу с таргетингом, текстами, стратегией и оптимизацией.');
+  }
+  if (id === 'budget') calcBudget();
+}
+
+function selectChip(el, groupId) {
+  document.querySelectorAll('#' + groupId + ' .chip-opt').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function getSelectedChip(groupId) {
+  const sel = document.querySelector('#' + groupId + ' .chip-opt.selected');
+  return sel ? sel.textContent.trim() : '';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function copyToClipboard(id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Скопировано!'));
+}
+
+async function callAI(prompt, onChunk) {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: MODEL, max_tokens: 1000,
+      system: AD_SYSTEM,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const data = await res.json();
+  return data.content?.[0]?.text || 'Ошибка генерации. Попробуйте снова.';
+}
+
+async function generateCopy() {
+  const product = document.getElementById('copy-product').value || 'продукт';
+  const platform = document.getElementById('copy-platform').value;
+  const audience = document.getElementById('copy-audience').value || 'широкая аудитория';
+  const benefit = document.getElementById('copy-benefit').value || 'уникальная выгода';
+  const tone = getSelectedChip('copy-tone-chips');
+
+  const output = document.getElementById('copy-output');
+  const result = document.getElementById('copy-result');
+  output.style.display = 'block';
+  result.innerHTML = '<div class="loading"><div class="spinner"></div>Генерирую текст...</div>';
+
+  const prompt = `Напиши рекламный текст для ${platform}.
+Продукт: ${product}
+Аудитория: ${audience}
+Главная выгода: ${benefit}
+Тон: ${tone}
+
+Формат: хук (первая фраза захватывающая), основной текст (2-3 абзаца), призыв к действию. Без лишних объяснений — только готовый рекламный текст.`;
+
+  const text = await callAI(prompt);
+  result.textContent = text;
+}
+
+async function generateHeadlines() {
+  const product = document.getElementById('hl-product').value || 'продукт';
+  const usp = document.getElementById('hl-usp').value || '';
+  const style = getSelectedChip('hl-style-chips');
+
+  const output = document.getElementById('hl-output');
+  const variants = document.getElementById('hl-variants');
+  output.style.display = 'block';
+  variants.innerHTML = '<div class="loading"><div class="spinner"></div>Генерирую заголовки...</div>';
+
+  const prompt = `Сгенерируй ровно 5 рекламных заголовков для: ${product}. УТП: ${usp}. Стиль: ${style}.
+
+Ответь ТОЛЬКО в формате JSON-массива (без markdown, без объяснений):
+[{"text":"заголовок","score":85,"tip":"короткий совет"},...]
+
+score от 50 до 99. tip — одно предложение почему заголовок работает.`;
+
+  const raw = await callAI(prompt);
+  try {
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const items = JSON.parse(clean);
+    variants.innerHTML = items.map((h, i) => {
+      const color = h.score >= 85 ? 'var(--teal)' : h.score >= 70 ? 'var(--amber)' : 'var(--text3)';
+      return `<div class="variant-card" onclick="this.classList.toggle('selected')">
+        <div class="variant-num">Вариант ${i+1}</div>
+        <div class="variant-text">${h.text}</div>
+        <div style="margin-top:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+            <span style="font-size:12px;color:var(--text3)">${h.tip}</span>
+            <span style="font-size:13px;font-weight:700;color:${color}">${h.score}/100</span>
+          </div>
+          <div class="score-bar"><div class="score-fill" style="width:${h.score}%;background:${color}"></div></div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    variants.innerHTML = `<div class="output-box"><div class="output-content">${raw}</div></div>`;
+  }
+}
+
+async function generateAudience() {
+  const product = document.getElementById('aud-product').value || 'продукт';
+  const price = document.getElementById('aud-price').value;
+  const geo = document.getElementById('aud-geo').value || 'Россия';
+
+  const output = document.getElementById('aud-output');
+  const result = document.getElementById('aud-result');
+  output.style.display = 'block';
+  result.innerHTML = '<div class="loading"><div class="spinner"></div>Анализирую аудиторию...</div>';
+
+  const prompt = `Составь детальный портрет целевой аудитории для:
+Продукт: ${product}
+Ценовой сегмент: ${price}
+Гео: ${geo}
+
+Структура ответа (используй эмодзи для разделов):
+👤 Демография (возраст, пол, статус, доход)
+🧠 Психография (ценности, образ жизни, интересы)
+😣 Боли и проблемы (3-4 главные)
+🎯 Мотивация к покупке
+📱 Где искать (платформы, каналы, время активности)
+💬 Как говорить с аудиторией (тон, триггеры, слова)`;
+
+  const text = await callAI(prompt);
+  result.textContent = text;
+}
+
+function buildUTM() {
+  const url = document.getElementById('utm-url').value.trim();
+  const source = document.getElementById('utm-source').value.trim();
+  const medium = document.getElementById('utm-medium').value.trim();
+  const campaign = document.getElementById('utm-campaign').value.trim();
+  const content = document.getElementById('utm-content').value.trim();
+  const term = document.getElementById('utm-term').value.trim();
+
+  if (!url) { document.getElementById('utm-result-box').style.display = 'none'; return; }
+
+  let params = [];
+  if (source) params.push('utm_source=' + encodeURIComponent(source));
+  if (medium) params.push('utm_medium=' + encodeURIComponent(medium));
+  if (campaign) params.push('utm_campaign=' + encodeURIComponent(campaign));
+  if (content) params.push('utm_content=' + encodeURIComponent(content));
+  if (term) params.push('utm_term=' + encodeURIComponent(term));
+
+  const sep = url.includes('?') ? '&' : '?';
+  const full = params.length ? url + sep + params.join('&') : url;
+  document.getElementById('utm-full-url').textContent = full;
+  document.getElementById('utm-result-box').style.display = 'block';
+}
+
+function fillUTM(source, medium) {
+  document.getElementById('utm-source').value = source;
+  document.getElementById('utm-medium').value = medium;
+  buildUTM();
+}
+
+function copyUTM() {
+  const text = document.getElementById('utm-full-url').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Ссылка скопирована!'));
+}
+
+function calcBudget() {
+  const budget = parseInt(document.getElementById('budget-slider').value);
+  const cpcBase = parseFloat(document.getElementById('budget-platform').value);
+  const conv = parseFloat(document.getElementById('budget-conv').value) / 100;
+  const check = parseFloat(document.getElementById('budget-check').value);
+
+  document.getElementById('budget-val').textContent = budget.toLocaleString('ru') + ' ₽';
+
+  const cpc = Math.round(budget * cpcBase / 100 * (0.8 + Math.random() * 0.4));
+  const clicks = Math.round(budget / cpc);
+  const leads = Math.round(clicks * conv);
+  const revenue = leads * check;
+  const roi = Math.round((revenue - budget) / budget * 100);
+
+  document.getElementById('calc-cpc').textContent = cpc.toLocaleString('ru') + ' ₽';
+  document.getElementById('calc-clicks').textContent = clicks.toLocaleString('ru');
+  document.getElementById('calc-leads').textContent = leads.toLocaleString('ru');
+  document.getElementById('calc-roi').textContent = (roi > 0 ? '+' : '') + roi + '%';
+  document.getElementById('calc-roi').style.color = roi > 0 ? 'var(--teal)' : 'var(--pink)';
+}
+
+async function generateBudgetTips() {
+  const budget = document.getElementById('budget-slider').value;
+  const platform = document.getElementById('budget-platform').options[document.getElementById('budget-platform').selectedIndex].text;
+  const tips = document.getElementById('budget-tips');
+  const tipsText = document.getElementById('budget-tips-text');
+  tips.style.display = 'block';
+  tipsText.innerHTML = '<div class="loading"><div class="spinner"></div>Анализирую...</div>';
+
+  const prompt = `Дай 4-5 конкретных рекомендации по оптимизации рекламного бюджета:
+Бюджет: ${parseInt(budget).toLocaleString('ru')} ₽/мес
+Платформа: ${platform}
+
+Советы должны быть практичными и конкретными. Используй эмодзи для каждого пункта.`;
+
+  const text = await callAI(prompt);
+  tipsText.textContent = text;
+}
+
+function addChatMsg(role, text) {
+  const msgs = document.getElementById('chat-messages');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap ' + role;
+  const isBot = role === 'bot';
+  wrap.innerHTML = `
+    <div class="msg-avatar ${isBot ? 'bot-av' : 'user-av'}">${isBot ? 'AI' : 'Вы'}</div>
+    <div class="msg-bubble">${text.replace(/\n/g, '<br>')}</div>`;
+  msgs.appendChild(wrap);
+  msgs.scrollTop = msgs.scrollHeight;
+  return wrap;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('chat-messages');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap bot';
+  wrap.id = 'typing';
+  wrap.innerHTML = `<div class="msg-avatar bot-av">AI</div><div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  msgs.appendChild(wrap);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('chat-sugs').style.display = 'none';
+
+  addChatMsg('user', text);
+  chatHistory.push({ role: 'user', content: text });
+  showTyping();
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: MODEL, max_tokens: 1000,
+        system: AD_SYSTEM,
+        messages: chatHistory
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Ошибка. Попробуйте снова.';
+    document.getElementById('typing')?.remove();
+    addChatMsg('bot', reply);
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch(e) {
+    document.getElementById('typing')?.remove();
+    addChatMsg('bot', 'Ошибка соединения. Попробуйте снова.');
+  }
+}
+
+function chatSuggest(el) {
+  document.getElementById('chat-input').value = el.textContent;
+  sendChat();
+}
+
+document.getElementById('chat-input').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+
+calcBudget();
+</script>
+</body>
+</html>
